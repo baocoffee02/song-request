@@ -15,35 +15,35 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: #f5f5f5;
     color: #222;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 header {
     background: #111;
     color: white;
-    padding: 20px;
     text-align: center;
+    padding: 20px 15px;
 }
 
 header h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 23px;
 }
 
 .tabs {
     display: flex;
     background: white;
-    border-bottom: 1px solid #ddd;
     position: sticky;
     top: 0;
     z-index: 10;
+    border-bottom: 1px solid #ddd;
 }
 
 .tab {
     flex: 1;
-    padding: 15px;
+    padding: 15px 10px;
     border: none;
     background: white;
     font-size: 16px;
@@ -57,9 +57,9 @@ header h1 {
 }
 
 #requests {
-    padding: 15px;
     max-width: 700px;
     margin: auto;
+    padding: 15px;
 }
 
 .card {
@@ -73,7 +73,7 @@ header h1 {
 .song {
     font-size: 21px;
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .info {
@@ -86,27 +86,27 @@ header h1 {
 }
 
 .message {
-    background: #f5f5f5;
+    margin-top: 10px;
     padding: 10px;
     border-radius: 8px;
-    margin-top: 10px;
+    background: #f5f5f5;
 }
 
 .time {
+    margin-top: 12px;
     color: #888;
     font-size: 13px;
-    margin-top: 12px;
 }
 
 .buttons {
     display: flex;
     gap: 10px;
-    margin-top: 16px;
+    margin-top: 17px;
 }
 
-button.action {
+.action {
     flex: 1;
-    padding: 12px;
+    padding: 12px 8px;
     border: none;
     border-radius: 9px;
     font-size: 15px;
@@ -114,7 +114,7 @@ button.action {
     cursor: pointer;
 }
 
-.done {
+.complete {
     background: #34c759;
     color: white;
 }
@@ -128,7 +128,6 @@ button.action {
     text-align: center;
     color: #888;
     padding: 50px 20px;
-    font-size: 16px;
 }
 </style>
 </head>
@@ -140,20 +139,27 @@ button.action {
 </header>
 
 <div class="tabs">
-    <button id="waitingTab" class="tab active">
+
+    <button id="pendingTab" class="tab active">
         Đang chờ
     </button>
 
     <button id="completedTab" class="tab">
         Đã hoàn thành
     </button>
+
 </div>
 
 <div id="requests"></div>
 
 <script>
 
+/* ==========================================
+   SUPABASE
+========================================== */
+
 const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
+
 const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
 
 const supabaseClient = supabase.createClient(
@@ -161,12 +167,20 @@ const supabaseClient = supabase.createClient(
     SUPABASE_ANON_KEY
 );
 
+
+/* ==========================================
+   TAB HIỆN TẠI
+
+   pending   = Đang chờ
+   completed = Đã hoàn thành
+========================================== */
+
 let currentTab = "pending";
 
 
-// ==========================
-// LẤY DANH SÁCH YÊU CẦU
-// ==========================
+/* ==========================================
+   TẢI DỮ LIỆU
+========================================== */
 
 async function loadRequests() {
 
@@ -177,54 +191,88 @@ async function loadRequests() {
             ascending: false
         });
 
+
     if (currentTab === "pending") {
+
         query = query.eq("status", "pending");
-    } else {
-        query = query.eq("status", "completed");
+
     }
+
+    if (currentTab === "completed") {
+
+        query = query.eq("status", "completed");
+
+    }
+
 
     const { data, error } = await query;
 
+
     if (error) {
-        console.error(error);
-        document.getElementById("requests").innerHTML =
-            `<div class="empty">Không thể tải dữ liệu.</div>`;
-        return;
-    }
 
-    renderRequests(data);
-}
+        console.error("Lỗi tải dữ liệu:", error);
 
-
-// ==========================
-// HIỂN THỊ
-// ==========================
-
-function renderRequests(data) {
-
-    const container = document.getElementById("requests");
-
-    if (!data || data.length === 0) {
-
-        container.innerHTML = `
+        document.getElementById("requests").innerHTML = `
             <div class="empty">
-                ${currentTab === "waiting"
-                    ? "Không có yêu cầu đang chờ."
-                    : "Chưa có bài nào hoàn thành."}
+                Không thể tải yêu cầu.
             </div>
         `;
 
         return;
     }
 
+
+    renderRequests(data);
+}
+
+
+/* ==========================================
+   HIỂN THỊ DANH SÁCH
+========================================== */
+
+function renderRequests(data) {
+
+    const container = document.getElementById("requests");
+
     container.innerHTML = "";
+
+
+    if (!data || data.length === 0) {
+
+        if (currentTab === "pending") {
+
+            container.innerHTML = `
+                <div class="empty">
+                    Không có yêu cầu đang chờ.
+                </div>
+            `;
+
+        }
+
+
+        if (currentTab === "completed") {
+
+            container.innerHTML = `
+                <div class="empty">
+                    Chưa có bài nào hoàn thành.
+                </div>
+            `;
+
+        }
+
+        return;
+    }
+
 
     data.forEach(request => {
 
         const card = document.createElement("div");
+
         card.className = "card";
 
+
         const date = new Date(request.created_at);
+
 
         const time = date.toLocaleString("vi-VN", {
             day: "2-digit",
@@ -234,6 +282,7 @@ function renderRequests(data) {
             minute: "2-digit"
         });
 
+
         card.innerHTML = `
 
             <div class="song">
@@ -241,186 +290,260 @@ function renderRequests(data) {
             </div>
 
             <div class="info">
-                <span class="label">Tên khách:</span>
+                <span class="label">
+                    Tên khách:
+                </span>
+
                 ${escapeHTML(request.customer_name || "")}
             </div>
 
+
             <div class="info">
-                <span class="label">Muốn gửi cho:</span>
+                <span class="label">
+                    Muốn gửi cho:
+                </span>
+
                 ${escapeHTML(request.send_to || "")}
             </div>
+
 
             ${
                 request.message
                 ? `
-                <div class="message">
-                    💬 ${escapeHTML(request.message)}
-                </div>
+                    <div class="message">
+                        💬 ${escapeHTML(request.message)}
+                    </div>
                 `
                 : ""
             }
+
 
             <div class="time">
                 🕐 ${time}
             </div>
 
+
             <div class="buttons">
 
                 ${
-                    currentTab === "waiting"
+                    currentTab === "pending"
                     ? `
-                    <button
-                        class="action done"
-                        onclick="markCompleted('${request.id}')">
-                        ✓ Đang chờ
-                    </button>
+                        <button
+                            class="action complete"
+                            onclick="markCompleted('${request.id}')">
+
+                            ✓ Đang chờ
+
+                        </button>
                     `
                     : ""
                 }
 
+
                 <button
                     class="action delete"
                     onclick="deleteRequest('${request.id}')">
+
                     🗑 Xóa yêu cầu
+
                 </button>
 
             </div>
         `;
 
+
         container.appendChild(card);
+
     });
 }
 
 
-// ==========================
-// ĐÁNH DẤU ĐÃ HÁT
-// ==========================
+/* ==========================================
+   CHUYỂN PENDING → COMPLETED
+========================================== */
 
 async function markCompleted(id) {
 
     const { error } = await supabaseClient
+
         .from("requests")
+
         .update({
             status: "completed"
         })
+
         .eq("id", id);
+
 
     if (error) {
 
-        alert("Không thể cập nhật yêu cầu.");
+        console.error("Lỗi cập nhật:", error);
 
-        console.error(error);
+        alert(
+            "Không thể chuyển sang Đã hoàn thành."
+        );
 
         return;
     }
 
-    loadRequests();
+
+    await loadRequests();
 }
 
 
-// ==========================
-// XÓA
-// ==========================
+/* ==========================================
+   XÓA YÊU CẦU
+========================================== */
 
 async function deleteRequest(id) {
 
-    const ok = confirm(
+    const confirmDelete = confirm(
         "Bạn có chắc muốn xóa yêu cầu này không?"
     );
 
-    if (!ok) return;
 
-    const { error } = await supabaseClient
-        .from("requests")
-        .delete()
-        .eq("id", id);
-
-    if (error) {
-
-        alert("Không thể xóa yêu cầu.");
-
-        console.error(error);
+    if (!confirmDelete) {
 
         return;
     }
 
-    loadRequests();
+
+    const { error } = await supabaseClient
+
+        .from("requests")
+
+        .delete()
+
+        .eq("id", id);
+
+
+    if (error) {
+
+        console.error("Lỗi xóa:", error);
+
+        alert(
+            "Không thể xóa yêu cầu."
+        );
+
+        return;
+    }
+
+
+    await loadRequests();
 }
 
 
-// ==========================
-// CHUYỂN TAB
-// ==========================
+/* ==========================================
+   TAB PENDING
+========================================== */
 
-document.getElementById("waitingTab").onclick = function() {
+document
+    .getElementById("pendingTab")
+    .addEventListener("click", function() {
 
-    currentTab = "waiting";
-
-    this.classList.add("active");
-
-    document
-        .getElementById("completedTab")
-        .classList.remove("active");
-
-    loadRequests();
-};
+        currentTab = "pending";
 
 
-document.getElementById("completedTab").onclick = function() {
-
-    currentTab = "completed";
-
-    this.classList.add("active");
-
-    document
-        .getElementById("waitingTab")
-        .classList.remove("active");
-
-    loadRequests();
-};
+        document
+            .getElementById("pendingTab")
+            .classList
+            .add("active");
 
 
-// ==========================
-// TỰ ĐỘNG CẬP NHẬT
-// ==========================
+        document
+            .getElementById("completedTab")
+            .classList
+            .remove("active");
+
+
+        loadRequests();
+
+    });
+
+
+/* ==========================================
+   TAB COMPLETED
+========================================== */
+
+document
+    .getElementById("completedTab")
+    .addEventListener("click", function() {
+
+        currentTab = "completed";
+
+
+        document
+            .getElementById("completedTab")
+            .classList
+            .add("active");
+
+
+        document
+            .getElementById("pendingTab")
+            .classList
+            .remove("active");
+
+
+        loadRequests();
+
+    });
+
+
+/* ==========================================
+   REALTIME
+========================================== */
 
 supabaseClient
+
     .channel("requests-realtime")
+
     .on(
         "postgres_changes",
+
         {
             event: "*",
             schema: "public",
             table: "requests"
         },
-        payload => {
 
-            console.log("Có thay đổi:", payload);
+        function(payload) {
+
+            console.log(
+                "Có thay đổi:",
+                payload
+            );
 
             loadRequests();
+
         }
     )
+
     .subscribe();
 
 
-// ==========================
-// CHỐNG HTML INJECTION
-// ==========================
+/* ==========================================
+   CHỐNG HTML INJECTION
+========================================== */
 
 function escapeHTML(text) {
 
     return String(text)
+
         .replace(/&/g, "&amp;")
+
         .replace(/</g, "&lt;")
+
         .replace(/>/g, "&gt;")
+
         .replace(/"/g, "&quot;")
+
         .replace(/'/g, "&#039;");
 }
 
 
-// ==========================
-// CHẠY LẦN ĐẦU
-// ==========================
+/* ==========================================
+   KHỞI ĐỘNG
+========================================== */
 
 loadRequests();
 
