@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yêu cầu bài hát</title>
+</head>
+
+<body>
+
+  <h1>🎵 Yêu cầu bài hát</h1>
+
+  <p>Chọn bài hát bạn muốn nghe:</p>
+
+  <input
+    type="text"
+    id="search"
+    placeholder="🔍 Tìm tên bài hát..."
+  >
+
+  <div id="songs"></div>
+
+  <script>
+    const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co/rest/v1/";
+    const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
+
+    async function loadSongs() {
+
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/songs?select=*`,
+        {
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        }
+      );
+
+      const songs = await response.json();
+
+      const container = document.getElementById("songs");
+
+      container.innerHTML = songs.map(song => `
+        <div style="margin:15px 0;">
+          <b>${song.title}</b>
+          <br>
+          <small>${song.artist || ""}</small>
+          <br>
+          <button onclick="requestSong(${song.id})">
+            🎤 Yêu cầu bài này
+          </button>
+        </div>
+      `).join("");
+    }
+
+    async function requestSong(songId) {
+
+      const name = prompt("Nhập tên hoặc số bàn của bạn:");
+
+      if (!name) return;
+
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/requests`,
+        {
+          method: "POST",
+
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+          },
+
+          body: JSON.stringify({
+            song_id: songId,
+            customer_name: name,
+            status: "pending"
+          })
+        }
+      );
+
+      if (response.ok) {
+        alert("✅ Đã gửi yêu cầu!");
+      } else {
+        alert("❌ Có lỗi, thử lại nhé.");
+      }
+    }
+
+    loadSongs();
+  </script>
+
+</body>
+</html>
