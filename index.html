@@ -176,14 +176,17 @@
           }
         );
 
+        
         if (!response.ok) {
+  const errorText = await response.text();
 
-          const errorText = await response.text();
+  message.textContent = "❌ " + errorText;
 
-          console.error(errorText);
+  console.log("Supabase error:", errorText);
 
-          throw new Error(errorText);
-        }
+  button.disabled = false;
+  return;
+}
 
         message.textContent = "✅ Đã gửi yêu cầu thành công!";
 
