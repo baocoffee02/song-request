@@ -4,90 +4,252 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yêu cầu bài hát</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px 15px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .song {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .song-title {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .artist {
+      color: #777;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    button {
+      border: none;
+      background: #111;
+      color: white;
+      padding: 10px 13px;
+      border-radius: 8px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #message {
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
+<header>
   <h1>🎵 Yêu cầu bài hát</h1>
+  <p>Chọn bài hát bạn muốn nghe</p>
+</header>
 
-  <p>Chọn bài hát bạn muốn nghe:</p>
+<div class="container">
 
   <input
     type="text"
     id="search"
-    placeholder="🔍 Tìm tên bài hát..."
+    placeholder="🔍 Tìm tên bài hát hoặc ca sĩ..."
   >
 
-  <div id="songs"></div>
+  <div id="songs">Đang tải danh sách bài hát...</div>
 
-  <script>
-    const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co/rest/v1/";
-    const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
+  <div id="message"></div>
 
-    async function loadSongs() {
+</div>
 
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/songs?select=*`,
-        {
-          headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-          }
+<script>
+
+const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co/rest/v1/";
+const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
+
+let allSongs = [];
+
+async function loadSongs() {
+
+  try {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/songs?select=*`,
+      {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
         }
-      );
-
-      const songs = await response.json();
-
-      const container = document.getElementById("songs");
-
-      container.innerHTML = songs.map(song => `
-        <div style="margin:15px 0;">
-          <b>${song.title}</b>
-          <br>
-          <small>${song.artist || ""}</small>
-          <br>
-          <button onclick="requestSong(${song.id})">
-            🎤 Yêu cầu bài này
-          </button>
-        </div>
-      `).join("");
-    }
-
-    async function requestSong(songId) {
-
-      const name = prompt("Nhập tên hoặc số bàn của bạn:");
-
-      if (!name) return;
-
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/requests`,
-        {
-          method: "POST",
-
-          headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
-
-          body: JSON.stringify({
-            song_id: songId,
-            customer_name: name,
-            status: "pending"
-          })
-        }
-      );
-
-      if (response.ok) {
-        alert("✅ Đã gửi yêu cầu!");
-      } else {
-        alert("❌ Có lỗi, thử lại nhé.");
       }
+    );
+
+    if (!response.ok) {
+      throw new Error("Không thể kết nối Supabase");
     }
 
-    loadSongs();
-  </script>
+    allSongs = await response.json();
+
+    displaySongs(allSongs);
+
+  } catch (error) {
+
+    document.getElementById("songs").innerHTML =
+      "❌ Không tải được danh sách bài hát.";
+
+    console.error(error);
+  }
+}
+
+
+function displaySongs(songs) {
+
+  const container = document.getElementById("songs");
+
+  if (songs.length === 0) {
+    container.innerHTML = "Không tìm thấy bài hát.";
+    return;
+  }
+
+  container.innerHTML = songs.map(song => `
+
+    <div class="song">
+
+      <div>
+        <div class="song-title">
+          ${song.title}
+        </div>
+
+        <div class="artist">
+          ${song.artist || ""}
+        </div>
+      </div>
+
+      <button onclick="requestSong(${song.id})">
+        Yêu cầu
+      </button>
+
+    </div>
+
+  `).join("");
+}
+
+
+document.getElementById("search").addEventListener("input", function() {
+
+  const keyword = this.value.toLowerCase();
+
+  const filtered = allSongs.filter(song =>
+    (song.title || "").toLowerCase().includes(keyword) ||
+    (song.artist || "").toLowerCase().includes(keyword)
+  );
+
+  displaySongs(filtered);
+
+});
+
+
+async function requestSong(songId) {
+
+  const name = prompt("Nhập tên hoặc số bàn của bạn:");
+
+  if (!name) return;
+
+  try {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/requests`,
+      {
+        method: "POST",
+
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+
+        body: JSON.stringify({
+          song_id: songId,
+          customer_name: name,
+          status: "pending"
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Gửi yêu cầu thất bại");
+    }
+
+    document.getElementById("message").innerHTML =
+      "✅ Đã gửi yêu cầu bài hát!";
+
+  } catch (error) {
+
+    document.getElementById("message").innerHTML =
+      "❌ Không thể gửi yêu cầu.";
+
+    console.error(error);
+  }
+
+}
+
+
+loadSongs();
+
+</script>
 
 </body>
 </html>
