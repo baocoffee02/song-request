@@ -398,19 +398,6 @@ if (!completedError) {
      ===================================================== */
 
   function renderRequests(data) {
-const deferred = JSON.parse(
-  localStorage.getItem("deferredRequests") || "[]"
-);
-
-data.sort((a, b) => {
-  const aDeferred = deferred.includes(a.id);
-  const bDeferred = deferred.includes(b.id);
-
-  if (aDeferred && !bDeferred) return 1;
-  if (!aDeferred && bDeferred) return -1;
-
-  return new Date(a.created_at) - new Date(b.created_at);
-});
 
     const box =
       document.getElementById("requests");
