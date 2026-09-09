@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Quản lý yêu cầu bài hát</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,7 +23,7 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 20px;
+      margin: 0 0 20px;
     }
 
     .tabs {
@@ -33,8 +34,8 @@
 
     .tab {
       flex: 1;
-      padding: 14px;
-      border: none;
+      padding: 13px;
+      border: 0;
       border-radius: 10px;
       background: #ddd;
       font-size: 16px;
@@ -44,7 +45,7 @@
 
     .tab.active {
       background: #222;
-      color: white;
+      color: #fff;
     }
 
     #requests {
@@ -54,15 +55,16 @@
     }
 
     .request {
-      background: white;
+      background: #fff;
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
     }
 
     .row {
       margin-bottom: 8px;
       line-height: 1.5;
+      word-break: break-word;
     }
 
     .label {
@@ -80,8 +82,8 @@
       margin-top: 14px;
     }
 
-    button.action {
-      border: none;
+    .action {
+      border: 0;
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 14px;
@@ -90,9 +92,9 @@
     }
 
     .complete {
+      flex: 1;
       background: #22c55e;
       color: white;
-      flex: 1;
     }
 
     .delete {
@@ -105,6 +107,13 @@
       color: #888;
       padding: 30px 10px;
     }
+
+    .error {
+      text-align: center;
+      color: #d00;
+      padding: 30px 10px;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 
@@ -113,77 +122,154 @@
   <h1>🎵 Yêu cầu bài hát</h1>
 
   <div class="tabs">
-    <button id="pendingTab" class="tab active" onclick="showTab('pending')">
+
+    <button
+      id="pendingTab"
+      class="tab active"
+      onclick="showTab('pending')">
       Đang chờ
     </button>
 
-    <button id="completedTab" class="tab" onclick="showTab('completed')">
+    <button
+      id="completedTab"
+      class="tab"
+      onclick="showTab('completed')">
       Đã hoàn thành
     </button>
+
   </div>
 
   <div id="requests">
     <div class="empty">Đang tải...</div>
   </div>
 
+
   <script>
+
+    /*
+     * =====================================================
+     * SUPABASE
+     * =====================================================
+     *
+     * ANH GIỮ NGUYÊN 2 DÒNG NÀY TỪ FILE ADMIN CŨ.
+     */
+
     const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
-    const SUPABASE_ANON_KEY = "https://ehvaahtsqxoscusanksj.supabase.co";
+
+    const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
+
 
     const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY
     );
 
+
+    /*
+     * Tab hiện tại
+     */
+
     let currentTab = "pending";
 
-    // =========================
-    // HIỂN THỊ TAB
-    // =========================
+
+    /*
+     * =====================================================
+     * HIỂN THỊ TAB
+     * =====================================================
+     */
+
     function showTab(tab) {
+
       currentTab = tab;
 
-      document.getElementById("pendingTab").classList.remove("active");
-      document.getElementById("completedTab").classList.remove("active");
+      document
+        .getElementById("pendingTab")
+        .classList.remove("active");
+
+      document
+        .getElementById("completedTab")
+        .classList.remove("active");
+
 
       if (tab === "pending") {
-        document.getElementById("pendingTab").classList.add("active");
+
+        document
+          .getElementById("pendingTab")
+          .classList.add("active");
+
       } else {
-        document.getElementById("completedTab").classList.add("active");
+
+        document
+          .getElementById("completedTab")
+          .classList.add("active");
+
       }
+
 
       loadRequests();
     }
 
 
-    // =========================
-    // TẢI DANH SÁCH
-    // =========================
+    /*
+     * =====================================================
+     * TẢI DANH SÁCH
+     * =====================================================
+     */
+
     async function loadRequests() {
 
-      const container = document.getElementById("requests");
+      const container =
+        document.getElementById("requests");
 
-      const { data, error } = await supabaseClient
-        .from("requests")
-        .select("*")
-        .eq("status", currentTab)
-        .order("created_at", {
-          ascending: true
-        });
+
+      const { data, error } =
+        await supabaseClient
+
+          .from("requests")
+
+          .select(
+            "id, customer_name, song_request, send_to, message, status, created_at"
+          )
+
+          .eq("status", currentTab)
+
+          /*
+           * QUAN TRỌNG:
+           *
+           * true = bài cũ nhất ở trên
+           * false = bài mới nhất ở trên
+           *
+           * Anh muốn order trước ở trên
+           */
+
+          .order("created_at", {
+            ascending: true
+          });
+
 
       if (error) {
-        console.error(error);
+
+        console.error(
+          "Supabase error:",
+          error
+        );
 
         container.innerHTML = `
-          <div class="empty">
+          <div class="error">
             Không thể tải dữ liệu
+
+            <br><br>
+
+            ${escapeHTML(error.message || "")}
           </div>
         `;
 
         return;
       }
 
+
       if (!data || data.length === 0) {
+
         container.innerHTML = `
           <div class="empty">
             Chưa có yêu cầu bài hát
@@ -193,57 +279,97 @@
         return;
       }
 
+
       container.innerHTML = "";
+
 
       data.forEach(request => {
 
-        const card = document.createElement("div");
+        const card =
+          document.createElement("div");
+
         card.className = "request";
 
-        const createdTime = request.created_at
-          ? new Date(request.created_at).toLocaleString("vi-VN")
-          : "";
 
-        let actionHTML = "";
+        const createdTime =
+          request.created_at
+            ? new Date(
+                request.created_at
+              ).toLocaleString("vi-VN")
+            : "";
+
+
+        let completeButton = "";
+
+
+        /*
+         * Chỉ tab Đang chờ mới có nút này
+         */
 
         if (currentTab === "pending") {
-          actionHTML = `
+
+          completeButton = `
             <button
               class="action complete"
               onclick="markCompleted('${request.id}')">
               ✓ Đang chờ
             </button>
           `;
+
         }
 
+
         card.innerHTML = `
-          <div class="row">
-            <span class="label">Tên khách:</span>
-            ${escapeHTML(request.customer_name || "")}
-          </div>
 
           <div class="row">
-            <span class="label">Bài hát:</span>
-            ${escapeHTML(request.song_request || "")}
+            <span class="label">
+              Tên khách:
+            </span>
+            ${escapeHTML(
+              request.customer_name || ""
+            )}
           </div>
 
-          <div class="row">
-            <span class="label">Muốn gửi cho:</span>
-            ${escapeHTML(request.send_to || "")}
-          </div>
 
           <div class="row">
-            <span class="label">Lời nhắn:</span>
-            ${escapeHTML(request.message || "")}
+            <span class="label">
+              Bài hát:
+            </span>
+            ${escapeHTML(
+              request.song_request || ""
+            )}
           </div>
+
+
+          <div class="row">
+            <span class="label">
+              Muốn gửi cho:
+            </span>
+            ${escapeHTML(
+              request.send_to || ""
+            )}
+          </div>
+
+
+          <div class="row">
+            <span class="label">
+              Lời nhắn:
+            </span>
+            ${escapeHTML(
+              request.message || ""
+            )}
+          </div>
+
 
           <div class="row time">
-            Thời gian gửi: ${createdTime}
+            Thời gian gửi:
+            ${escapeHTML(createdTime)}
           </div>
+
 
           <div class="actions">
 
-            ${actionHTML}
+            ${completeButton}
 
             <button
               class="action delete"
@@ -252,106 +378,228 @@
             </button>
 
           </div>
+
         `;
 
+
         container.appendChild(card);
+
       });
+
     }
 
 
-    // =========================
-    // CHUYỂN SANG ĐÃ HOÀN THÀNH
-    // =========================
+    /*
+     * =====================================================
+     * ĐÁNH DẤU ĐÃ HOÀN THÀNH
+     * =====================================================
+     */
+
     async function markCompleted(id) {
 
-      const { error } = await supabaseClient
-        .from("requests")
-        .update({
-          status: "completed"
-        })
-        .eq("id", id);
+      const { error } =
+        await supabaseClient
+
+          .from("requests")
+
+          .update({
+            status: "completed"
+          })
+
+          .eq("id", id);
+
 
       if (error) {
+
         console.error(error);
-        alert("Không thể cập nhật trạng thái");
+
+        alert(
+          "Không thể cập nhật trạng thái:\n" +
+          error.message
+        );
+
         return;
       }
 
-      // Cập nhật ngay lập tức
+
+      /*
+       * Cập nhật ngay lập tức.
+       *
+       * Realtime cũng sẽ cập nhật cho các thiết bị khác.
+       */
+
       await loadRequests();
+
     }
 
 
-    // =========================
-    // XÓA
-    // =========================
+    /*
+     * =====================================================
+     * XÓA
+     * =====================================================
+     */
+
     async function deleteRequest(id) {
 
-      if (!confirm("Bạn có chắc muốn xóa yêu cầu này không?")) {
+      if (
+        !confirm(
+          "Bạn có chắc muốn xóa yêu cầu này không?"
+        )
+      ) {
         return;
       }
 
-      const { error } = await supabaseClient
-        .from("requests")
-        .delete()
-        .eq("id", id);
+
+      const { error } =
+        await supabaseClient
+
+          .from("requests")
+
+          .delete()
+
+          .eq("id", id);
+
 
       if (error) {
+
         console.error(error);
-        alert("Không thể xóa yêu cầu");
+
+        alert(
+          "Không thể xóa yêu cầu:\n" +
+          error.message
+        );
+
         return;
       }
 
-      // Cập nhật ngay
+
       await loadRequests();
+
     }
 
 
-    // =========================
-    // CHỐNG HTML LỖI / XSS
-    // =========================
+    /*
+     * =====================================================
+     * BẢO VỆ HIỂN THỊ
+     * =====================================================
+     */
+
     function escapeHTML(text) {
 
       return String(text)
+
         .replace(/&/g, "&amp;")
+
         .replace(/</g, "&lt;")
+
         .replace(/>/g, "&gt;")
+
         .replace(/"/g, "&quot;")
+
         .replace(/'/g, "&#039;");
+
     }
 
 
-    // =========================
-    // REALTIME
-    // =========================
-    supabaseClient
-      .channel("requests-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "requests"
-        },
-        payload => {
+    /*
+     * =====================================================
+     * REALTIME
+     * =====================================================
+     *
+     * Khi khách gửi bài mới:
+     * INSERT → tự load
+     *
+     * Khi bấm Đang chờ:
+     * UPDATE → tự load
+     *
+     * Khi xóa:
+     * DELETE → tự load
+     */
 
-          console.log("Có thay đổi:", payload);
+    const realtimeChannel =
+      supabaseClient
 
-          // Tự động tải lại danh sách
-          // Không cần F5
-          loadRequests();
-        }
-      )
-      .subscribe(status => {
+        .channel("song-request-live")
 
-        console.log("Realtime:", status);
+        .on(
+          "postgres_changes",
 
-      });
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "requests"
+          },
+
+          payload => {
+
+            console.log(
+              "Có bài mới:",
+              payload.new
+            );
+
+            loadRequests();
+
+          }
+        )
+
+        .on(
+          "postgres_changes",
+
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "requests"
+          },
+
+          payload => {
+
+            console.log(
+              "Có thay đổi:",
+              payload.new
+            );
+
+            loadRequests();
+
+          }
+        )
+
+        .on(
+          "postgres_changes",
+
+          {
+            event: "DELETE",
+            schema: "public",
+            table: "requests"
+          },
+
+          payload => {
+
+            console.log(
+              "Đã xóa:",
+              payload.old
+            );
+
+            loadRequests();
+
+          }
+        )
+
+        .subscribe(status => {
+
+          console.log(
+            "Realtime status:",
+            status
+          );
+
+        });
 
 
-    // =========================
-    // TẢI LẦN ĐẦU
-    // =========================
+    /*
+     * =====================================================
+     * TẢI DỮ LIỆU LẦN ĐẦU
+     * =====================================================
+     */
+
     loadRequests();
 
   </script>
