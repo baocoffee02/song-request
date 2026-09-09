@@ -502,7 +502,41 @@ onclick="deferRequest('${request.id}')">
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
      ===================================================== */
 
-  async function completeRequest(id) {
+ function deferRequest(id) {
+function renderRequests(data) {
+  const deferred = JSON.parse(
+    localStorage.getItem("deferredRequests") || "[]"
+  );
+
+  data.sort((a, b) => {
+    const aDeferred = deferred.includes(a.id);
+    const bDeferred = deferred.includes(b.id);
+
+    if (aDeferred && !bDeferred) return 1;
+    if (!aDeferred && bDeferred) return -1;
+
+    return new Date(a.created_at) - new Date(b.created_at);
+  });
+
+  // phần code cũ của anh tiếp tục ở đây...
+  const deferred = JSON.parse(
+    localStorage.getItem("deferredRequests") || "[]"
+  );
+
+  if (!deferred.includes(id)) {
+    deferred.push(id);
+    localStorage.setItem(
+      "deferredRequests",
+      JSON.stringify(deferred)
+    );
+  }
+
+  lastDataSignature = "";
+  loadRequests(true);
+}
+
+async function completeRequest(id) {
+async function completeRequest(id) {
 
     try {
 
