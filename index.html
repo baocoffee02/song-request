@@ -78,6 +78,9 @@
       margin-top: 18px;
       font-weight: bold;
     }
+    #message {
+  margin-top: 30px;
+}
   </style>
 </head>
 
@@ -148,12 +151,12 @@
         document.getElementById("submitBtn");
 
       if (!customerName) {
-        message.textContent = "⚠️ Anh/chị hãy nhập tên.";
+        message.textContent = "⚠️ Bạn hãy nhập tên.";
         return;
       }
 
       if (!songRequest) {
-        message.textContent = "⚠️ Anh/chị hãy nhập tên bài hát.";
+        message.textContent = "⚠️ Bạn hãy nhập tên bài hát.";
         return;
       }
 
@@ -195,7 +198,7 @@
   return;
 }
 
-        message.textContent = "✅ Đã gửi yêu cầu thành công!";
+        message.textContent = "✅ Đã gửi yêu cầu thành công. Xin cảm ơn!";
 
         document.getElementById("customer_name").value = "";
         document.getElementById("song_request").value = "";
