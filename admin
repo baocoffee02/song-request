@@ -106,17 +106,43 @@
       background: #f2f2f2;
       border-radius: 8px;
     }
+.time {
+  color: #666;
+  font-size: 13px;
+  margin-top: 10px;
+}
 
-    .time {
-      color: #666;
-      font-size: 13px;
-      margin-top: 10px;
-    }
+.status {
+  color: #666;
+  font-size: 13px;
+  margin-top: 10px;
+  white-space: nowrap;
+}
+
+.priority-icon {
+  font-size: 22px;
+  line-height: 1;
+  margin-top: 10px;
+}
 .time-status {
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
+
+.time {
+  flex: 1;
+}
+
+.priority-icon {
+  width: 40px;
+  text-align: center;
+}
+
+.status {
+  flex: 1;
+  text-align: right;
+}
+
     .buttons {
       display: flex;
       gap: 8px;
@@ -469,21 +495,26 @@ if (!completedError) {
                 `
                 : ""
             }
-
-            <div class="time-status">
+<div class="time-status">
   <div class="time">
     🕐 ${time}
   </div>
 
-  <div class="status">
   ${
-    request.status === "performing"
-      ? "🔵 Đang giao lưu"
-      : request.status === "completed"
-        ? "🟢 Hoàn thành"
-        : "🟡 Đang chờ"
+    request.priority
+      ? `<div class="priority-icon">🚀</div>`
+      : ""
   }
-</div>
+
+  <div class="status">
+    ${
+      request.status === "performing"
+        ? "🔵 Đang giao lưu"
+        : request.status === "completed"
+          ? "🟢 Hoàn thành"
+          : "🟡 Đang chờ"
+    }
+  </div>
 </div>
 
 
