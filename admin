@@ -428,6 +428,9 @@ if (!completedError) {
 
         return `
           <div class="request">
+<div class="status">
+  🟡 Đang chờ
+</div>
 
             <div class="request-title">
               🎵 ${escapeHtml(request.song_request || "")}
@@ -466,10 +469,10 @@ if (!completedError) {
 
                   ? `
                     <button
-                      class="complete-btn"
-                      onclick="completeRequest('${request.id}')">
-                      ✅ Đã hoàn thành
-                    </button>
+  class="complete-btn"
+  onclick="startPerformance('${request.id}')">
+  🎤 Giao lưu
+</button>
                   `
 
                   : ""
@@ -496,7 +499,24 @@ if (!completedError) {
   /* =====================================================
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
      ===================================================== */
+async function startPerformance(id) {
 
+  const { error } = await supabaseClient
+    .from("requests")
+    .update({
+      status: "performing"
+    })
+    .eq("id", id);
+
+  if (error) {
+    alert("Không thể bắt đầu giao lưu: " + error.message);
+    return;
+  }
+
+  lastDataSignature = "";
+
+  await loadRequests(true);
+}
   async function completeRequest(id) {
 
     try {
