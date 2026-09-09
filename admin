@@ -470,6 +470,11 @@ if (!completedError) {
                       onclick="completeRequest('${request.id}')">
                       ✅ Đã hoàn thành
                     </button>
+<button
+  class="complete-btn"
+  onclick="deferRequest('${request.id}')">
+  ⏭️ Để sau
+</button>
                   `
 
                   : ""
