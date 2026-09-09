@@ -347,41 +347,27 @@
     .getElementById("statusTab")
     .classList.toggle("active", tab === "status");
 
-    updateClearCompletedButton();
+  updateClearCompletedButton();
 
   const statusPanel =
     document.getElementById("siteStatusPanel");
 
+  const requests =
+    document.getElementById("requests");
+
   if (tab === "status") {
 
     statusPanel.style.display = "block";
-
-    document.getElementById("requests").style.display = "none";
+    requests.style.display = "none";
 
     return;
   }
 
   statusPanel.style.display = "none";
-
-  document.getElementById("requests").style.display = "block";
+  requests.style.display = "block";
 
   loadRequests(true);
-
-  /* =====================================================
-     NÚT XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH
-     ===================================================== */
-
-  function updateClearCompletedButton() {
-
-    const button =
-      document.getElementById("clearCompletedButton");
-
-    if (currentTab === "completed") {
-      button.style.display = "block";
-    } else {
-      button.style.display = "none";
-    }
-  }
+}
 
 
   /* =====================================================
