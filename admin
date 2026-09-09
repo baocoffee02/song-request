@@ -467,26 +467,38 @@ if (!completedError) {
   </div>
 
   <div class="status">
-    🟡 Đang chờ
-  </div>
+  ${
+    request.status === "performing"
+      ? "🔵 Đang giao lưu"
+      : request.status === "completed"
+        ? "🟢 Hoàn thành"
+        : "🟡 Đang chờ"
+  }
+</div>
 </div>
 
 
             <div class="buttons">
 
               ${
-                currentTab === "pending"
-
-                  ? `
-                    <button
-  class="complete-btn"
-  onclick="startPerformance('${request.id}')">
-  🎤 Giao lưu
-</button>
-                  `
-
-                  : ""
-              }
+  currentTab === "pending"
+    ? request.status === "performing"
+      ? `
+        <button
+          class="complete-btn"
+          onclick="completeRequest('${request.id}')">
+          ✅ Hoàn thành
+        </button>
+      `
+      : `
+        <button
+          class="complete-btn"
+          onclick="startPerformance('${request.id}')">
+          🎤 Giao lưu
+        </button>
+      `
+    : ""
+}
 
 
               <button
