@@ -20,7 +20,7 @@
       /* ===== HÌNH NỀN ===== */
       background-image:
         linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-        url("./3E62121E-EF1C-40BB-BBF6-6155BD696F4F.jpeg");
+        url("./690B4E43-7B2D-4B56-B34A-F743F3E33029.jpeg");
 
       background-size: cover;
       background-position: center;
@@ -169,7 +169,7 @@
 
 <div class="container">
 
-  <h1>🎵 Quản lý yêu cầu bài hát</h1>
+  <h1>QUẢN LÝ YÊU CẦU</h1>
 
   <div class="tabs">
     <button
