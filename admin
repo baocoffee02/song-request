@@ -306,15 +306,16 @@
       const { data, error } = await supabaseClient
         .from("requests")
 
-        .select(`
-          id,
-          customer_name,
-          song_request,
-          send_to,
-          message,
-          status,
-          created_at
-        `)
+      .select(`
+  id,
+  customer_name,
+  song_request,
+  send_to,
+  message,
+  priority,
+  status,
+  created_at
+`)
 
  .or(
   currentTab === "pending"
@@ -326,7 +327,15 @@
         .order("created_at", {
           ascending: true
         });
+const orderedData = (data || []).slice().sort((a, b) => {
 
+  if (a.priority && !b.priority) return -1;
+
+  if (!a.priority && b.priority) return 1;
+
+  return new Date(a.created_at) - new Date(b.created_at);
+
+});
 
       if (error) {
         throw error;
@@ -381,7 +390,7 @@ if (!completedError) {
 
       lastDataSignature = signature;
 
-      renderRequests(data || []);
+      renderRequests(orderedData);
 
     }
 
