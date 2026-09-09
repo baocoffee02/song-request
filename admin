@@ -435,7 +435,7 @@ if (!completedError) {
 
 
         return `
-          
+          <div class="request">
             <div class="request-title">
               🎵 ${escapeHtml(request.song_request || "")}
             </div>
