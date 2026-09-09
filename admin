@@ -380,6 +380,24 @@ const orderedData = (data || []).slice().sort((a, b) => {
   return aIndex - bIndex;
 });
 
+const deferred = JSON.parse(
+  localStorage.getItem("deferredRequests") || "[]"
+);
+
+const orderedData = (data || []).slice().sort((a, b) => {
+  const aIndex = deferred.indexOf(a.id);
+  const bIndex = deferred.indexOf(b.id);
+
+  if (aIndex === -1 && bIndex === -1) {
+    return new Date(a.created_at) - new Date(b.created_at);
+  }
+
+  if (aIndex === -1) return -1;
+  if (bIndex === -1) return 1;
+
+  return aIndex - bIndex;
+});
+
 const signature = JSON.stringify(
   orderedData
 );
