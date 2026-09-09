@@ -221,18 +221,28 @@
   <h1>QUẢN LÝ YÊU CẦU</h1>
 
   <div class="tabs">
+
   <button
     id="pendingTab"
     class="tab active"
     onclick="showTab('pending')">
     Đang chờ <span id="pendingCount">0</span>
   </button>
+
   <button
     id="completedTab"
     class="tab"
     onclick="showTab('completed')">
     Đã hoàn thành <span id="completedCount">0</span>
   </button>
+
+  <button
+    id="statusTab"
+    class="tab"
+    onclick="showTab('status')">
+    ⚙️ Trạng thái
+  </button>
+
 </div>
 
   <button
@@ -242,7 +252,42 @@
     style="display:none;">
     🗑 Xóa tất cả bài đã hoàn thành
   </button>
+  <div id="siteStatusPanel" style="display:none;">
 
+    <button
+      onclick="setRequestStatus(true)"
+      style="
+        width:100%;
+        padding:16px;
+        margin-bottom:10px;
+        border:none;
+        border-radius:10px;
+        background:#27ae60;
+        color:white;
+        font-size:17px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      🟢 Mở Nhận Yêu Cầu
+    </button>
+
+    <button
+      onclick="setRequestStatus(false)"
+      style="
+        width:100%;
+        padding:16px;
+        border:none;
+        border-radius:10px;
+        background:#d63031;
+        color:white;
+        font-size:17px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      🔴 Ngưng Nhận Yêu Cầu
+    </button>
+
+  </div>
   <div id="errorBox"></div>
 
   <div id="requests">
@@ -288,21 +333,39 @@
 
   function showTab(tab) {
 
-    currentTab = tab;
+  currentTab = tab;
 
-    document
-      .getElementById("pendingTab")
-      .classList.toggle("active", tab === "pending");
+  document
+    .getElementById("pendingTab")
+    .classList.toggle("active", tab === "pending");
 
-    document
-      .getElementById("completedTab")
-      .classList.toggle("active", tab === "completed");
+  document
+    .getElementById("completedTab")
+    .classList.toggle("active", tab === "completed");
+
+  document
+    .getElementById("statusTab")
+    .classList.toggle("active", tab === "status");
 
     updateClearCompletedButton();
 
-    loadRequests(true);
+  const statusPanel =
+    document.getElementById("siteStatusPanel");
+
+  if (tab === "status") {
+
+    statusPanel.style.display = "block";
+
+    document.getElementById("requests").style.display = "none";
+
+    return;
   }
 
+  statusPanel.style.display = "none";
+
+  document.getElementById("requests").style.display = "block";
+
+  loadRequests(true);
 
   /* =====================================================
      NÚT XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH
