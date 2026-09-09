@@ -312,7 +312,11 @@
           created_at
         `)
 
-        .eq("status", currentTab)
+ .or(
+  currentTab === "pending"
+    ? "status.eq.pending,status.eq.performing"
+    : "status.eq.completed"
+)
 
         // CŨ NHẤT Ở TRÊN
         .order("created_at", {
