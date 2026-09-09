@@ -358,49 +358,9 @@ if (!completedError) {
         => tránh màn hình nhấp nháy mỗi 2 giây.
       */
 
-      const deferred = JSON.parse(
-  localStorage.getItem("deferredRequests") || "[]"
-);
-
-const orderedData = (data || []).slice().sort((a, b) => {
-
-  const aIndex = deferred.indexOf(a.id);
-  const bIndex = deferred.indexOf(b.id);
-
-  // Cả hai chưa để sau → giữ thứ tự cũ
-  if (aIndex === -1 && bIndex === -1) {
-    return new Date(a.created_at) - new Date(b.created_at);
-  }
-
-  // Bài chưa để sau đứng trước
-  if (aIndex === -1) return -1;
-  if (bIndex === -1) return 1;
-
-  // Các bài đã "Để sau" → giữ thứ tự được bấm
-  return aIndex - bIndex;
-});
-
-const deferred = JSON.parse(
-  localStorage.getItem("deferredRequests") || "[]"
-);
-
-const orderedData = (data || []).slice().sort((a, b) => {
-  const aIndex = deferred.indexOf(a.id);
-  const bIndex = deferred.indexOf(b.id);
-
-  if (aIndex === -1 && bIndex === -1) {
-    return new Date(a.created_at) - new Date(b.created_at);
-  }
-
-  if (aIndex === -1) return -1;
-  if (bIndex === -1) return 1;
-
-  return aIndex - bIndex;
-});
-
-const signature = JSON.stringify(
-  orderedData
-);
+      const signature = JSON.stringify(
+        data || []
+      );
 
 
       if (
@@ -413,7 +373,7 @@ const signature = JSON.stringify(
 
       lastDataSignature = signature;
 
-      renderRequests(orderedData);
+      renderRequests(data || []);
 
     }
 
@@ -510,11 +470,6 @@ const signature = JSON.stringify(
                       onclick="completeRequest('${request.id}')">
                       ✅ Đã hoàn thành
                     </button>
-<button
-  class="complete-btn"
-  onclick="deferRequest('${request.id}')">
-  ⏭️ Để sau
-</button>
                   `
 
                   : ""
@@ -541,27 +496,6 @@ const signature = JSON.stringify(
   /* =====================================================
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
      ===================================================== */
-
-function deferRequest(id) {
-
-  let deferred = JSON.parse(
-    localStorage.getItem("deferredRequests") || "[]"
-  );
-
-  // Nếu bài đã có trong danh sách thì đưa nó xuống cuối
-  deferred = deferred.filter(item => item !== id);
-  deferred.push(id);
-
-  localStorage.setItem(
-    "deferredRequests",
-    JSON.stringify(deferred)
-  );
-
-  // Bắt buộc tải lại danh sách
-  lastDataSignature = "";
-
-  loadRequests(true);
-}
 
   async function completeRequest(id) {
 
