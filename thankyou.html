@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Cảm ơn quý khách</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+
+      background-image: url("./6827385C-6C22-4E0E-B396-912F0944EF5C.jpeg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 40px;
+    }
+
+    .exit-button {
+      border: none;
+      border-radius: 12px;
+
+      padding: 14px 45px;
+
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+
+      font-size: 18px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .exit-button:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+
+<body>
+
+  <button class="exit-button" onclick="exitPage()">
+    Thoát
+  </button>
+
+  <script>
+    function exitPage() {
+      window.location.href = "about:blank";
+    }
+  </script>
+
+</body>
+</html>
