@@ -470,11 +470,6 @@ if (!completedError) {
                       onclick="completeRequest('${request.id}')">
                       ✅ Đã hoàn thành
                     </button>
-<button
-class="complete-btn"
-onclick="deferRequest('${request.id}')">
-⏭️ Để sau
-</button>
                   `
 
                   : ""
@@ -502,25 +497,7 @@ onclick="deferRequest('${request.id}')">
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
      ===================================================== */
 
- function deferRequest(id) {
-  const deferred = JSON.parse(
-    localStorage.getItem("deferredRequests") || "[]"
-  );
-
-  if (!deferred.includes(id)) {
-    deferred.push(id);
-    localStorage.setItem(
-      "deferredRequests",
-      JSON.stringify(deferred)
-    );
-  }
-
-  lastDataSignature = "";
-  loadRequests(true);
-}
-
-async function completeRequest(id) {
-async function completeRequest(id) {
+  async function completeRequest(id) {
 
     try {
 
