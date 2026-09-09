@@ -125,13 +125,54 @@
     <div id="message"></div>
 
   </div>
+<div id="priorityModal" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:white;
+    width:90%;
+    max-width:400px;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+  ">
+    <h3>🔥 Ưu tiên lên trước</h3>
 
+    <p>
+      Bạn có sẵn lòng tip 1man cho band để được ưu tiên lên trước không?
+    </p>
+
+    <button
+      type="button"
+      onclick="confirmPriority()"
+      style="width:100%; padding:12px; margin-top:10px;"
+    >
+      Đồng ý
+    </button>
+
+    <button
+      type="button"
+      onclick="closePriority()"
+      style="width:100%; padding:12px; margin-top:8px;"
+    >
+      Hủy
+    </button>
+  </div>
+</div>
+
+<script>
   <script>
 
     const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
 
-    async function sendRequest() {
+    async function sendRequest(isPriority = false) {
 
       const customerName =
         document.getElementById("customer_name").value.trim();
@@ -219,7 +260,20 @@
 
       }
     }
+function showPriorityConfirm() {
+  document.getElementById("priorityModal").style.display = "flex";
+}
 
+function closePriority() {
+  document.getElementById("priorityModal").style.display = "none";
+}
+
+function confirmPriority() {
+  closePriority();
+
+  // Đánh dấu yêu cầu là ưu tiên
+  sendRequest(true);
+}
   </script>
 
 </body>
