@@ -221,28 +221,18 @@
   <h1>QUẢN LÝ YÊU CẦU</h1>
 
   <div class="tabs">
-
   <button
     id="pendingTab"
     class="tab active"
     onclick="showTab('pending')">
     Đang chờ <span id="pendingCount">0</span>
   </button>
-
   <button
     id="completedTab"
     class="tab"
     onclick="showTab('completed')">
     Đã hoàn thành <span id="completedCount">0</span>
   </button>
-
-  <button
-    id="statusTab"
-    class="tab"
-    onclick="showTab('status')">
-    ⚙️ Trạng thái
-  </button>
-
 </div>
 
   <button
@@ -252,42 +242,7 @@
     style="display:none;">
     🗑 Xóa tất cả bài đã hoàn thành
   </button>
-  <div id="siteStatusPanel" style="display:none;">
 
-    <button
-      onclick="setRequestStatus(true)"
-      style="
-        width:100%;
-        padding:16px;
-        margin-bottom:10px;
-        border:none;
-        border-radius:10px;
-        background:#27ae60;
-        color:white;
-        font-size:17px;
-        font-weight:bold;
-        cursor:pointer;
-      ">
-      🟢 Mở Nhận Yêu Cầu
-    </button>
-
-    <button
-      onclick="setRequestStatus(false)"
-      style="
-        width:100%;
-        padding:16px;
-        border:none;
-        border-radius:10px;
-        background:#d63031;
-        color:white;
-        font-size:17px;
-        font-weight:bold;
-        cursor:pointer;
-      ">
-      🔴 Ngưng Nhận Yêu Cầu
-    </button>
-
-  </div>
   <div id="errorBox"></div>
 
   <div id="requests">
@@ -297,7 +252,6 @@
   </div>
 
 </div>
-
 
 <script>
 
@@ -311,12 +265,10 @@
 
   const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
 
-
   const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
-
 
   /* =====================================================
      BIẾN
@@ -326,49 +278,42 @@
 
   let lastDataSignature = "";
 
-
   /* =====================================================
      HIỂN THỊ TAB
      ===================================================== */
 
   function showTab(tab) {
 
-  currentTab = tab;
+    currentTab = tab;
 
-  document
-    .getElementById("pendingTab")
-    .classList.toggle("active", tab === "pending");
+    document
+      .getElementById("pendingTab")
+      .classList.toggle("active", tab === "pending");
 
-  document
-    .getElementById("completedTab")
-    .classList.toggle("active", tab === "completed");
+    document
+      .getElementById("completedTab")
+      .classList.toggle("active", tab === "completed");
 
-  document
-    .getElementById("statusTab")
-    .classList.toggle("active", tab === "status");
+    updateClearCompletedButton();
 
-  updateClearCompletedButton();
-
-  const statusPanel =
-    document.getElementById("siteStatusPanel");
-
-  const requests =
-    document.getElementById("requests");
-
-  if (tab === "status") {
-
-    statusPanel.style.display = "block";
-    requests.style.display = "none";
-
-    return;
+    loadRequests(true);
   }
 
-  statusPanel.style.display = "none";
-  requests.style.display = "block";
+  /* =====================================================
+     NÚT XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH
+     ===================================================== */
 
-  loadRequests(true);
-}
+  function updateClearCompletedButton() {
 
+    const button =
+      document.getElementById("clearCompletedButton");
+
+    if (currentTab === "completed") {
+      button.style.display = "block";
+    } else {
+      button.style.display = "none";
+    }
+  }
 
   /* =====================================================
      TẢI DANH SÁCH
@@ -442,7 +387,6 @@ if (!completedError) {
     completedCount || 0;
 }
 
-
       /*
         Tạo chuỗi kiểm tra.
 
@@ -454,14 +398,12 @@ if (!completedError) {
         data || []
       );
 
-
       if (
         signature === lastDataSignature &&
         !forceRender
       ) {
         return;
       }
-
 
       lastDataSignature = signature;
 
@@ -484,61 +426,121 @@ if (!completedError) {
 
   }
 
-
   /* =====================================================
-     HIỂN THỊ function showTab(tab) {
+     HIỂN THỊ REQUEST
+     ===================================================== */
 
-  currentTab = tab;
+  function renderRequests(data) {
 
-  document
-    .getElementById("pendingTab")
-    .classList.toggle("active", tab === "pending");
+    const box =
+      document.getElementById("requests");
 
-  document
-    .getElementById("completedTab")
-    .classList.toggle("active", tab === "completed");
+    if (!data.length) {
 
-  document
-    .getElementById("statusTab")
-    .classList.toggle("active", tab === "status");
+      box.innerHTML = `
+        <div class="empty">
+          ${
+            currentTab === "pending"
+              ? "🎵 Chưa có bài hát nào đang chờ."
+              : "✅ Chưa có bài hát nào hoàn thành."
+          }
+        </div>
+      `;
 
+      return;
+    }
 
-  const clearButton =
-    document.getElementById("clearCompletedButton");
+    box.innerHTML = data
+      .map(request => {
 
-  const statusPanel =
-    document.getElementById("siteStatusPanel");
+        const time =
+          formatDate(request.created_at);
 
-  const requests =
-    document.getElementById("requests");
+        return `
+          <div class="request">
+            <div class="request-title">
+              🎵 ${escapeHtml(request.song_request || "")}
+            </div>
 
+            <div class="info">
+              <span class="label">👤 Tên khách:</span>
+              ${escapeHtml(request.customer_name || "")}
+            </div>
 
-  if (tab === "status") {
+            <div class="info">
+              <span class="label">🎤 Muốn gửi cho:</span>
+              ${escapeHtml(request.send_to || "")}
+            </div>
 
-    clearButton.style.display = "none";
+            ${
+              request.message
+                ? `
+                  <div class="message">
+                    <span class="label">💬 Lời nhắn:</span><br>
+                    ${escapeHtml(request.message)}
+                  </div>
+                `
+                : ""
+            }
+<div class="time-status">
+  <div class="time">
+    🕐 ${time}
+  </div>
 
-    statusPanel.style.display = "block";
-
-    requests.style.display = "none";
-
-    return;
+  ${
+    request.priority
+      ? `<div class="priority-icon">🚀</div>`
+      : ""
   }
 
+  <div class="status">
+    ${
+      request.status === "performing"
+        ? "🔵 Đang giao lưu"
+        : request.status === "completed"
+          ? "🟢 Hoàn thành"
+          : "🟡 Đang chờ"
+    }
+  </div>
+</div>
 
-  statusPanel.style.display = "none";
+            <div class="buttons">
 
-  requests.style.display = "block";
-
-
-  if (tab === "completed") {
-    clearButton.style.display = "block";
-  } else {
-    clearButton.style.display = "none";
-  }
-
-
-  loadRequests(true);
+              ${
+  currentTab === "pending"
+    ? request.status === "performing"
+      ? `
+        <button
+          class="complete-btn"
+          onclick="completeRequest('${request.id}')">
+          ✅ Hoàn thành
+        </button>
+      `
+      : `
+        <button
+          class="complete-btn"
+          onclick="startPerformance('${request.id}')">
+          🎤 Giao lưu
+        </button>
+      `
+    : ""
 }
+
+              <button
+                class="delete-btn"
+                onclick="deleteRequest('${request.id}')">
+                🗑 Xóa
+              </button>
+
+            </div>
+
+          </div>
+        `;
+
+      })
+      .join("");
+
+  }
 
   /* =====================================================
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
@@ -573,11 +575,9 @@ async function startPerformance(id) {
           })
           .eq("id", id);
 
-
       if (error) {
         throw error;
       }
-
 
       // Reset để chắc chắn danh sách được cập nhật
       lastDataSignature = "";
@@ -597,7 +597,6 @@ async function startPerformance(id) {
 
   }
 
-
   /* =====================================================
      XÓA MỘT BÀI
      ===================================================== */
@@ -609,11 +608,9 @@ async function startPerformance(id) {
         "Anh có chắc muốn xóa bài hát này không?"
       );
 
-
     if (!ok) {
       return;
     }
-
 
     try {
 
@@ -623,11 +620,9 @@ async function startPerformance(id) {
           .delete()
           .eq("id", id);
 
-
       if (error) {
         throw error;
       }
-
 
       lastDataSignature = "";
 
@@ -645,7 +640,6 @@ async function startPerformance(id) {
     }
 
   }
-
 
   /* =====================================================
      XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH
@@ -658,11 +652,9 @@ async function startPerformance(id) {
         "⚠️ Anh có chắc muốn xóa TẤT CẢ bài đã hoàn thành không?"
       );
 
-
     if (!ok) {
       return;
     }
-
 
     try {
 
@@ -672,11 +664,9 @@ async function startPerformance(id) {
           .delete()
           .eq("status", "completed");
 
-
       if (error) {
         throw error;
       }
-
 
       lastDataSignature = "";
 
@@ -695,7 +685,6 @@ async function startPerformance(id) {
 
   }
 
-
   /* =====================================================
      ĐỊNH DẠNG THỜI GIAN
      ===================================================== */
@@ -706,10 +695,8 @@ async function startPerformance(id) {
       return "";
     }
 
-
     const date =
       new Date(dateString);
-
 
     return date.toLocaleString(
       "vi-VN",
@@ -723,7 +710,6 @@ async function startPerformance(id) {
     );
 
   }
-
 
   /* =====================================================
      CHỐNG HTML
@@ -739,7 +725,6 @@ async function startPerformance(id) {
       .replace(/'/g, "&#039;");
 
   }
-
 
   /* =====================================================
      TỰ ĐỘNG KIỂM TRA DỮ LIỆU
@@ -762,7 +747,6 @@ async function startPerformance(id) {
     },
     2000
   );
-
 
   /* =====================================================
      KHỞI ĐỘNG
