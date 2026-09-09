@@ -486,126 +486,59 @@ if (!completedError) {
 
 
   /* =====================================================
-     HIỂN THỊ REQUEST
-     ===================================================== */
+     HIỂN THỊ function showTab(tab) {
 
-  function renderRequests(data) {
+  currentTab = tab;
 
-    const box =
-      document.getElementById("requests");
+  document
+    .getElementById("pendingTab")
+    .classList.toggle("active", tab === "pending");
 
+  document
+    .getElementById("completedTab")
+    .classList.toggle("active", tab === "completed");
 
-    if (!data.length) {
-
-      box.innerHTML = `
-        <div class="empty">
-          ${
-            currentTab === "pending"
-              ? "🎵 Chưa có bài hát nào đang chờ."
-              : "✅ Chưa có bài hát nào hoàn thành."
-          }
-        </div>
-      `;
-
-      return;
-    }
+  document
+    .getElementById("statusTab")
+    .classList.toggle("active", tab === "status");
 
 
-    box.innerHTML = data
-      .map(request => {
+  const clearButton =
+    document.getElementById("clearCompletedButton");
 
-        const time =
-          formatDate(request.created_at);
+  const statusPanel =
+    document.getElementById("siteStatusPanel");
+
+  const requests =
+    document.getElementById("requests");
 
 
-        return `
-          <div class="request">
-            <div class="request-title">
-              🎵 ${escapeHtml(request.song_request || "")}
-            </div>
+  if (tab === "status") {
 
-            <div class="info">
-              <span class="label">👤 Tên khách:</span>
-              ${escapeHtml(request.customer_name || "")}
-            </div>
+    clearButton.style.display = "none";
 
-            <div class="info">
-              <span class="label">🎤 Muốn gửi cho:</span>
-              ${escapeHtml(request.send_to || "")}
-            </div>
+    statusPanel.style.display = "block";
 
-            ${
-              request.message
-                ? `
-                  <div class="message">
-                    <span class="label">💬 Lời nhắn:</span><br>
-                    ${escapeHtml(request.message)}
-                  </div>
-                `
-                : ""
-            }
-<div class="time-status">
-  <div class="time">
-    🕐 ${time}
-  </div>
+    requests.style.display = "none";
 
-  ${
-    request.priority
-      ? `<div class="priority-icon">🚀</div>`
-      : ""
+    return;
   }
 
-  <div class="status">
-    ${
-      request.status === "performing"
-        ? "🔵 Đang giao lưu"
-        : request.status === "completed"
-          ? "🟢 Hoàn thành"
-          : "🟡 Đang chờ"
-    }
-  </div>
-</div>
+
+  statusPanel.style.display = "none";
+
+  requests.style.display = "block";
 
 
-            <div class="buttons">
+  if (tab === "completed") {
+    clearButton.style.display = "block";
+  } else {
+    clearButton.style.display = "none";
+  }
 
-              ${
-  currentTab === "pending"
-    ? request.status === "performing"
-      ? `
-        <button
-          class="complete-btn"
-          onclick="completeRequest('${request.id}')">
-          ✅ Hoàn thành
-        </button>
-      `
-      : `
-        <button
-          class="complete-btn"
-          onclick="startPerformance('${request.id}')">
-          🎤 Giao lưu
-        </button>
-      `
-    : ""
+
+  loadRequests(true);
 }
-
-
-              <button
-                class="delete-btn"
-                onclick="deleteRequest('${request.id}')">
-                🗑 Xóa
-              </button>
-
-            </div>
-
-          </div>
-        `;
-
-      })
-      .join("");
-
-  }
-
 
   /* =====================================================
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
