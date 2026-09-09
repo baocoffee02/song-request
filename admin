@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Quản lý yêu cầu bài hát</title>
+  <title>QUẢN LÝ YÊU CẦU</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -20,7 +20,7 @@
       /* ===== HÌNH NỀN ===== */
       background-image:
         linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-        url("./898BB70E-9FDA-4F58-93E1-C8BC905FEEF3.jpeg");
+        url("./3E62121E-EF1C-40BB-BBF6-6155BD696F4F.jpeg");
 
       background-size: cover;
       background-position: center;
