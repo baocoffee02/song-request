@@ -523,22 +523,28 @@ const signature = JSON.stringify(
   /* =====================================================
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
      ===================================================== */
+
 function deferRequest(id) {
-  const deferred = JSON.parse(
+
+  let deferred = JSON.parse(
     localStorage.getItem("deferredRequests") || "[]"
   );
 
-  if (!deferred.includes(id)) {
-    deferred.push(id);
-    localStorage.setItem(
-      "deferredRequests",
-      JSON.stringify(deferred)
-    );
-  }
+  // Nếu bài đã có trong danh sách thì đưa nó xuống cuối
+  deferred = deferred.filter(item => item !== id);
+  deferred.push(id);
 
+  localStorage.setItem(
+    "deferredRequests",
+    JSON.stringify(deferred)
+  );
+
+  // Bắt buộc tải lại danh sách
   lastDataSignature = "";
-loadRequests(true);
+
+  loadRequests(true);
 }
+
   async function completeRequest(id) {
 
     try {
