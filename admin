@@ -112,6 +112,11 @@
       font-size: 13px;
       margin-top: 10px;
     }
+.time-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
     .buttons {
       display: flex;
@@ -431,11 +436,7 @@ if (!completedError) {
 
 
         return `
-          <div class="request">
-<div class="status">
-  🟡 Đang chờ
-</div>
-
+          
             <div class="request-title">
               🎵 ${escapeHtml(request.song_request || "")}
             </div>
@@ -461,9 +462,15 @@ if (!completedError) {
                 : ""
             }
 
-            <div class="time">
-              🕐 ${time}
-            </div>
+            <div class="time-status">
+  <div class="time">
+    🕐 ${time}
+  </div>
+
+  <div class="status">
+    🟡 Đang chờ
+  </div>
+</div>
 
 
             <div class="buttons">
