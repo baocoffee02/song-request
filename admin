@@ -214,9 +214,9 @@
 
   // ⚠️ DÁN LẠI 2 THÔNG TIN CŨ CỦA ANH VÀO ĐÂY
 
-  const SUPABASE_URL = "DÁN SUPABASE URL CŨ CỦA ANH VÀO ĐÂY";
+  const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
 
-  const SUPABASE_ANON_KEY = "DÁN SUPABASE ANON KEY CŨ CỦA ANH VÀO ĐÂY";
+  const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
 
 
   const supabaseClient = supabase.createClient(
