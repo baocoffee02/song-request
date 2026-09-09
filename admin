@@ -162,6 +162,25 @@
       border-radius: 12px;
       text-align: center;
     }
+.tab span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 24px;
+  height: 24px;
+
+  margin-left: 5px;
+  padding: 0 6px;
+
+  border-radius: 50px;
+
+  background: #e74c3c;
+  color: white;
+
+  font-size: 13px;
+  font-weight: bold;
+}
   </style>
 </head>
 
@@ -172,20 +191,19 @@
   <h1>QUẢN LÝ YÊU CẦU</h1>
 
   <div class="tabs">
-    <button
-      id="pendingTab"
-      class="tab active"
-      onclick="showTab('pending')">
-      Đang chờ
-    </button>
-
-    <button
-      id="completedTab"
-      class="tab"
-      onclick="showTab('completed')">
-      Đã hoàn thành
-    </button>
-  </div>
+  <button
+    id="pendingTab"
+    class="tab active"
+    onclick="showTab('pending')">
+    Đang chờ <span id="pendingCount">0</span>
+  </button>
+  <button
+    id="completedTab"
+    class="tab"
+    onclick="showTab('completed')">
+    Đã hoàn thành <span id="completedCount">0</span>
+  </button>
+</div>
 
   <button
     id="clearCompletedButton"
@@ -305,6 +323,32 @@
       if (error) {
         throw error;
       }
+// Đếm số bài đang chờ
+const { count: pendingCount, error: pendingError } =
+  await supabaseClient
+    .from("requests")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .eq("status", "pending");
+if (!pendingError) {
+  document.getElementById("pendingCount").textContent =
+    pendingCount || 0;
+}
+// Đếm số bài đã hoàn thành
+const { count: completedCount, error: completedError } =
+  await supabaseClient
+    .from("requests")
+    .select("*", {
+      count: "exact",
+      head: true
+    })
+    .eq("status", "completed");
+if (!completedError) {
+  document.getElementById("completedCount").textContent =
+    completedCount || 0;
+}
 
 
       /*
