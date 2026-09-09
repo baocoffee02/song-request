@@ -501,7 +501,21 @@ if (!completedError) {
   /* =====================================================
      ĐÁNH DẤU ĐÃ HOÀN THÀNH
      ===================================================== */
+function deferRequest(id) {
+  const deferred = JSON.parse(
+    localStorage.getItem("deferredRequests") || "[]"
+  );
 
+  if (!deferred.includes(id)) {
+    deferred.push(id);
+    localStorage.setItem(
+      "deferredRequests",
+      JSON.stringify(deferred)
+    );
+  }
+
+  loadRequests(false);
+}
   async function completeRequest(id) {
 
     try {
