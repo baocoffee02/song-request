@@ -53,7 +53,7 @@ export default {
 
         <body>
           <div class="box">
-            <h2>📶 Vui lòng kết nối Wi-Fi của Bảo Coffee</h2>
+            <h2>📶 Vui lòng kết nối Wi-Fi của Bao Coffee</h2>
             <p>
               Bạn cần sử dụng Wi-Fi của quán để gửi yêu cầu bài hát.
             </p>
