@@ -812,14 +812,10 @@
 
                       ? `
                         <button
-                          class="complete-btn"
-                          onclick="
-                            completeRequest(
-                              '${request.id}'
-                            )
-                          ">
-                          ✅ Hoàn thành
-                        </button>
+  class="complete-btn"
+  onclick="completeRequest('${request.id}')">
+  ✅ Kết thúc
+</button>
                       `
 
                       : `
