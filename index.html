@@ -187,7 +187,9 @@
 
       const messageText =
         document.getElementById("message_text").value.trim();
-
+      
+const youtubeLink =
+  document.getElementById("youtube_link").value.trim();
       const message =
         document.getElementById("message");
 
@@ -222,12 +224,13 @@
             },
 
             body: JSON.stringify({
-              customer_name: customerName,
-              song_request: songRequest,
-              send_to: sendTo,
-              message: messageText,
-              priority: isPriority
-            })
+  customer_name: customerName,
+  song_request: songRequest,
+  send_to: sendTo,
+  message: messageText,
+  youtube_link: youtubeLink,
+  priority: isPriority
+})
           }
         );
 
