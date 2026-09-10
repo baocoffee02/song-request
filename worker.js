@@ -39,10 +39,7 @@ export default {
       "/thankyou.html"
     ];
 
-    if (
-      protectedPaths.includes(url.pathname) &&
-      clientIP !== ALLOWED_IP
-    ) {
+    if (false) {
       return new Response(
         `
         <!DOCTYPE html>
