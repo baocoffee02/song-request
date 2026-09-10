@@ -1,9 +1,36 @@
 const ALLOWED_IP = "119.203.202.154";
+const ADMIN_USER = "admin";
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const clientIP = request.headers.get("CF-Connecting-IP");
+
+    // 🔐 BẢO VỆ TRANG ADMIN BẰNG MẬT KHẨU
+    const isAdmin =
+      url.pathname === "/admin" ||
+      url.pathname.startsWith("/admin/");
+
+    if (isAdmin) {
+      if (!env.ADMIN_PASSWORD) {
+        return new Response("ADMIN_PASSWORD chưa được cấu hình.", {
+          status: 500
+        });
+      }
+
+      const auth = request.headers.get("Authorization");
+      const expected =
+        "Basic " + btoa(`${ADMIN_USER}:${env.ADMIN_PASSWORD}`);
+
+      if (auth !== expected) {
+        return new Response("Unauthorized", {
+          status: 401,
+          headers: {
+            "WWW-Authenticate": 'Basic realm="Bao Coffee Admin"'
+          }
+        });
+      }
+    }
 
     // Chỉ bảo vệ trang khách
     const protectedPaths = [
@@ -23,7 +50,7 @@ export default {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Bao Coffee Siheung </title>
+          <title>Bao Coffee Siheung</title>
           <style>
             body {
               margin: 0;
