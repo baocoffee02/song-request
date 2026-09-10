@@ -145,35 +145,40 @@
       text-align: right;
     }
 
+    /* =====================================================
+       CÁC NÚT TRONG REQUEST
+       ===================================================== */
+
     .buttons {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-top: 14px;
+      align-items: stretch;
     }
 
     .buttons button {
-      flex: 1;
+      height: 44px;
       border: none;
-      border-radius: 9px;
-      padding: 11px 8px;
+      border-radius: 6px;
+      padding: 0 6px;
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
+      white-space: nowrap;
     }
 
+    /* ===== GIAO LƯU ===== */
+
     .complete-btn {
+      flex: 1;
       background: #27ae60;
       color: white;
     }
 
-    /* ===== NÚT YOUTUBE ===== */
+    /* ===== YOUTUBE ===== */
 
     .youtube-btn {
-      background: #222;
-      color: white;
-    }
-
-    .youtube-btn.has-youtube {
+      flex: 1;
       background: #27ae60;
       color: white;
     }
@@ -182,7 +187,22 @@
       opacity: 0.8;
     }
 
+    /* ===== HỢP ÂM ===== */
+
+    .chord-btn {
+      flex: 1;
+      background: #27ae60;
+      color: white;
+    }
+
+    .chord-btn:active {
+      opacity: 0.8;
+    }
+
+    /* ===== XÓA ===== */
+
     .delete-btn {
+      flex: 0.65;
       background: #e74c3c;
       color: white;
     }
@@ -691,9 +711,22 @@
 
           const youtubeButton = `
             <button
-              class="youtube-btn has-youtube"
+              class="youtube-btn"
               onclick="openYoutube('${escapeJs(request.youtube_link || "")}', '${escapeJs(request.song_request || "")}')">
               🎬 YouTube
+            </button>
+          `;
+
+
+          /* =============================================
+             HỢP ÂM BUTTON
+             ============================================= */
+
+          const chordButton = `
+            <button
+              class="chord-btn"
+              onclick="openChord('${escapeJs(request.song_request || "")}')">
+              🎸 Hợp âm
             </button>
           `;
 
@@ -803,10 +836,10 @@
 
                       ? `
                         <button
-  class="complete-btn"
-  onclick="completeRequest('${request.id}')">
-  ✅ Kết thúc
-</button>
+                          class="complete-btn"
+                          onclick="completeRequest('${request.id}')">
+                          ✅ Kết thúc
+                        </button>
                       `
 
                       : `
@@ -828,6 +861,11 @@
                 <!-- ===== YOUTUBE ===== -->
 
                 ${youtubeButton}
+
+
+                <!-- ===== HỢP ÂM ===== -->
+
+                ${chordButton}
 
 
                 <!-- ===== XÓA ===== -->
@@ -1013,6 +1051,25 @@
       return null;
 
     }
+
+  }
+
+
+  /* =====================================================
+     HỢP ÂM CHUẨN
+     ===================================================== */
+
+  function openChord(songName) {
+
+    const searchUrl =
+      "https://hopamchuan.com/search?q=" +
+      encodeURIComponent(songName);
+
+
+    window.open(
+      searchUrl,
+      "_blank"
+    );
 
   }
 
