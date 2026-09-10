@@ -689,22 +689,13 @@
              YOUTUBE BUTTON
              ============================================= */
 
-          const youtubeButton =
-            request.youtube_link
-              ? `
-                <button
-                  class="youtube-btn has-youtube"
-                  onclick="openYoutube('${escapeJs(request.youtube_link)}')">
-                  🎬 YouTube
-                </button>
-              `
-              : `
-                <button
-                  class="youtube-btn"
-                  onclick="doNothing()">
-                  🎬 YouTube
-                </button>
-              `;
+          const youtubeButton = `
+            <button
+              class="youtube-btn has-youtube"
+              onclick="openYoutube('${escapeJs(request.youtube_link || "")}', '${escapeJs(request.song_request || "")}')">
+              🎬 YouTube
+            </button>
+          `;
 
 
           return `
@@ -868,36 +859,30 @@
      YOUTUBE
      ===================================================== */
 
-  function openYoutube(url) {
-
-    if (!url) {
-      return;
-    }
+  function openYoutube(url, songName) {
 
     const videoId =
       getYoutubeVideoId(url);
-
-    if (!videoId) {
-
-      alert(
-        "Link YouTube không hợp lệ."
-      );
-
-      return;
-    }
-
 
     const frame =
       document.getElementById(
         "youtubeFrame"
       );
 
+    if (videoId) {
 
-    frame.src =
-      "https://www.youtube.com/embed/" +
-      videoId +
-      "?autoplay=1&rel=0";
+      frame.src =
+        "https://www.youtube.com/embed/" +
+        videoId +
+        "?autoplay=1&rel=0";
 
+    } else {
+
+      frame.src =
+        "https://www.youtube.com/results?search_query=" +
+        encodeURIComponent(songName);
+
+    }
 
     document
       .getElementById(
@@ -1007,17 +992,6 @@
       return null;
 
     }
-
-  }
-
-
-  /* =====================================================
-     NÚT YOUTUBE KHÔNG CÓ LINK
-     ===================================================== */
-
-  function doNothing() {
-
-    // Không làm gì nếu khách không gửi link YouTube
 
   }
 
