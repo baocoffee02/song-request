@@ -106,42 +106,44 @@
       background: #f2f2f2;
       border-radius: 8px;
     }
-.time {
-  color: #666;
-  font-size: 13px;
-  margin-top: 10px;
-}
 
-.status {
-  color: #666;
-  font-size: 13px;
-  margin-top: 10px;
-  white-space: nowrap;
-}
+    .time {
+      color: #666;
+      font-size: 13px;
+      margin-top: 10px;
+    }
 
-.priority-icon {
-  font-size: 22px;
-  line-height: 1;
-  margin-top: 10px;
-}
-.time-status {
-  display: flex;
-  align-items: center;
-}
+    .status {
+      color: #666;
+      font-size: 13px;
+      margin-top: 10px;
+      white-space: nowrap;
+    }
 
-.time {
-  flex: 1;
-}
+    .priority-icon {
+      font-size: 22px;
+      line-height: 1;
+      margin-top: 10px;
+    }
 
-.priority-icon {
-  width: 40px;
-  text-align: center;
-}
+    .time-status {
+      display: flex;
+      align-items: center;
+    }
 
-.status {
-  flex: 1;
-  text-align: right;
-}
+    .time {
+      flex: 1;
+    }
+
+    .priority-icon {
+      width: 40px;
+      text-align: center;
+    }
+
+    .status {
+      flex: 1;
+      text-align: right;
+    }
 
     .buttons {
       display: flex;
@@ -162,6 +164,22 @@
     .complete-btn {
       background: #27ae60;
       color: white;
+    }
+
+    /* ===== NÚT YOUTUBE ===== */
+
+    .youtube-btn {
+      background: #222;
+      color: white;
+    }
+
+    .youtube-btn.has-youtube {
+      background: #27ae60;
+      color: white;
+    }
+
+    .youtube-btn:active {
+      opacity: 0.8;
     }
 
     .delete-btn {
@@ -192,25 +210,93 @@
       border-radius: 12px;
       text-align: center;
     }
-.tab span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 
-  min-width: 24px;
-  height: 24px;
+    .tab span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
-  margin-left: 5px;
-  padding: 0 6px;
+      min-width: 24px;
+      height: 24px;
 
-  border-radius: 50px;
+      margin-left: 5px;
+      padding: 0 6px;
 
-  background: #e74c3c;
-  color: white;
+      border-radius: 50px;
 
-  font-size: 13px;
-  font-weight: bold;
-}
+      background: #e74c3c;
+      color: white;
+
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* =====================================================
+       POPUP YOUTUBE
+       ===================================================== */
+
+    #youtubeModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 99999;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+    }
+
+    .youtube-popup {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    }
+
+    .youtube-video {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+
+    .youtube-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .youtube-close {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+
+      width: 38px;
+      height: 38px;
+
+      border: none;
+      border-radius: 50%;
+
+      background: rgba(0,0,0,0.75);
+      color: white;
+
+      font-size: 22px;
+      font-weight: bold;
+
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .youtube-close:hover {
+      background: rgba(0,0,0,0.95);
+    }
+
   </style>
 </head>
 
@@ -221,19 +307,22 @@
   <h1>QUẢN LÝ YÊU CẦU</h1>
 
   <div class="tabs">
-  <button
-    id="pendingTab"
-    class="tab active"
-    onclick="showTab('pending')">
-    Đang chờ <span id="pendingCount">0</span>
-  </button>
-  <button
-    id="completedTab"
-    class="tab"
-    onclick="showTab('completed')">
-    Đã hoàn thành <span id="completedCount">0</span>
-  </button>
-</div>
+
+    <button
+      id="pendingTab"
+      class="tab active"
+      onclick="showTab('pending')">
+      Đang chờ <span id="pendingCount">0</span>
+    </button>
+
+    <button
+      id="completedTab"
+      class="tab"
+      onclick="showTab('completed')">
+      Đã hoàn thành <span id="completedCount">0</span>
+    </button>
+
+  </div>
 
   <button
     id="clearCompletedButton"
@@ -246,12 +335,45 @@
   <div id="errorBox"></div>
 
   <div id="requests">
+
     <div class="loading">
       Đang tải dữ liệu...
     </div>
+
   </div>
 
 </div>
+
+
+<!-- =====================================================
+     POPUP YOUTUBE
+     ===================================================== -->
+
+<div id="youtubeModal">
+
+  <div class="youtube-popup">
+
+    <button
+      class="youtube-close"
+      onclick="closeYoutube()">
+      ✕
+    </button>
+
+    <div class="youtube-video">
+
+      <iframe
+        id="youtubeFrame"
+        src=""
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+
+    </div>
+
+  </div>
+
+</div>
+
 
 <script>
 
@@ -259,16 +381,18 @@
      SUPABASE
      ===================================================== */
 
-  // ⚠️ DÁN LẠI 2 THÔNG TIN CŨ CỦA ANH VÀO ĐÂY
+  const SUPABASE_URL =
+    "https://ehvaahtsqxoscusanksj.supabase.co";
 
-  const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
 
-  const SUPABASE_ANON_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
 
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
 
   /* =====================================================
      BIẾN
@@ -277,6 +401,7 @@
   let currentTab = "pending";
 
   let lastDataSignature = "";
+
 
   /* =====================================================
      HIỂN THỊ TAB
@@ -288,16 +413,23 @@
 
     document
       .getElementById("pendingTab")
-      .classList.toggle("active", tab === "pending");
+      .classList.toggle(
+        "active",
+        tab === "pending"
+      );
 
     document
       .getElementById("completedTab")
-      .classList.toggle("active", tab === "completed");
+      .classList.toggle(
+        "active",
+        tab === "completed"
+      );
 
     updateClearCompletedButton();
 
     loadRequests(true);
   }
+
 
   /* =====================================================
      NÚT XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH
@@ -306,14 +438,22 @@
   function updateClearCompletedButton() {
 
     const button =
-      document.getElementById("clearCompletedButton");
+      document.getElementById(
+        "clearCompletedButton"
+      );
 
     if (currentTab === "completed") {
+
       button.style.display = "block";
+
     } else {
+
       button.style.display = "none";
+
     }
+
   }
+
 
   /* =====================================================
      TẢI DANH SÁCH
@@ -323,91 +463,160 @@
 
     try {
 
-      const { data, error } = await supabaseClient
-        .from("requests")
+      const { data, error } =
+        await supabaseClient
+          .from("requests")
+          .select(`
+            id,
+            customer_name,
+            song_request,
+            send_to,
+            message,
+            youtube_link,
+            priority,
+            status,
+            created_at
+          `)
+          .or(
+            currentTab === "pending"
+              ? "status.eq.pending,status.eq.performing"
+              : "status.eq.completed"
+          )
+          .order("created_at", {
+            ascending: true
+          });
 
-      .select(`
-  id,
-  customer_name,
-  song_request,
-  send_to,
-  message,
-  priority,
-  status,
-  created_at
-`)
-
- .or(
-  currentTab === "pending"
-    ? "status.eq.pending,status.eq.performing"
-    : "status.eq.completed"
-)
-
-        // CŨ NHẤT Ở TRÊN
-        .order("created_at", {
-          ascending: true
-        });
-const orderedData = (data || []).slice().sort((a, b) => {
-
-  if (a.priority && !b.priority) return -1;
-
-  if (!a.priority && b.priority) return 1;
-
-  return new Date(a.created_at) - new Date(b.created_at);
-
-});
 
       if (error) {
         throw error;
       }
-// Đếm số bài đang chờ
-const { count: pendingCount, error: pendingError } =
-  await supabaseClient
-    .from("requests")
-    .select("*", {
-      count: "exact",
-      head: true
-    })
-    .eq("status", "pending");
-if (!pendingError) {
-  document.getElementById("pendingCount").textContent =
-    pendingCount || 0;
-}
-// Đếm số bài đã hoàn thành
-const { count: completedCount, error: completedError } =
-  await supabaseClient
-    .from("requests")
-    .select("*", {
-      count: "exact",
-      head: true
-    })
-    .eq("status", "completed");
-if (!completedError) {
-  document.getElementById("completedCount").textContent =
-    completedCount || 0;
-}
+
+
+      /* =================================================
+         SẮP XẾP ƯU TIÊN
+         ================================================= */
+
+      const orderedData =
+        (data || [])
+          .slice()
+          .sort((a, b) => {
+
+            if (
+              a.priority &&
+              !b.priority
+            ) {
+              return -1;
+            }
+
+            if (
+              !a.priority &&
+              b.priority
+            ) {
+              return 1;
+            }
+
+            return (
+              new Date(a.created_at) -
+              new Date(b.created_at)
+            );
+
+          });
+
+
+      /* =================================================
+         ĐẾM SỐ BÀI ĐANG CHỜ
+         ================================================= */
+
+      const {
+        count: pendingCount,
+        error: pendingError
+      } =
+        await supabaseClient
+          .from("requests")
+          .select("*", {
+            count: "exact",
+            head: true
+          })
+          .eq(
+            "status",
+            "pending"
+          );
+
+
+      if (!pendingError) {
+
+        document
+          .getElementById(
+            "pendingCount"
+          )
+          .textContent =
+            pendingCount || 0;
+
+      }
+
+
+      /* =================================================
+         ĐẾM SỐ BÀI ĐÃ HOÀN THÀNH
+         ================================================= */
+
+      const {
+        count: completedCount,
+        error: completedError
+      } =
+        await supabaseClient
+          .from("requests")
+          .select("*", {
+            count: "exact",
+            head: true
+          })
+          .eq(
+            "status",
+            "completed"
+          );
+
+
+      if (!completedError) {
+
+        document
+          .getElementById(
+            "completedCount"
+          )
+          .textContent =
+            completedCount || 0;
+
+      }
+
 
       /*
         Tạo chuỗi kiểm tra.
 
-        Nếu dữ liệu không thay đổi thì không render lại
+        Nếu dữ liệu không thay đổi
+        thì không render lại
         => tránh màn hình nhấp nháy mỗi 2 giây.
       */
 
-      const signature = JSON.stringify(
-        data || []
-      );
+      const signature =
+        JSON.stringify(
+          data || []
+        );
+
 
       if (
-        signature === lastDataSignature &&
+        signature ===
+          lastDataSignature &&
         !forceRender
       ) {
         return;
       }
 
-      lastDataSignature = signature;
 
-      renderRequests(orderedData);
+      lastDataSignature =
+        signature;
+
+
+      renderRequests(
+        orderedData
+      );
 
     }
 
@@ -415,16 +624,26 @@ if (!completedError) {
 
       console.error(error);
 
-      document.getElementById("errorBox").innerHTML = `
-        <div class="error">
-          ❌ Không thể tải dữ liệu.<br>
-          <small>${escapeHtml(error.message || "Lỗi kết nối Supabase")}</small>
-        </div>
-      `;
+      document
+        .getElementById(
+          "errorBox"
+        )
+        .innerHTML = `
+          <div class="error">
+            ❌ Không thể tải dữ liệu.<br>
+            <small>
+              ${escapeHtml(
+                error.message ||
+                "Lỗi kết nối Supabase"
+              )}
+            </small>
+          </div>
+        `;
 
     }
 
   }
+
 
   /* =====================================================
      HIỂN THỊ REQUEST
@@ -433,136 +652,414 @@ if (!completedError) {
   function renderRequests(data) {
 
     const box =
-      document.getElementById("requests");
+      document.getElementById(
+        "requests"
+      );
+
 
     if (!data.length) {
 
       box.innerHTML = `
         <div class="empty">
+
           ${
             currentTab === "pending"
               ? "🎵 Chưa có bài hát nào đang chờ."
               : "✅ Chưa có bài hát nào hoàn thành."
           }
+
         </div>
       `;
 
       return;
     }
 
-    box.innerHTML = data
-      .map(request => {
 
-        const time =
-          formatDate(request.created_at);
+    box.innerHTML =
+      data
+        .map(request => {
 
-        return `
-          <div class="request">
-            <div class="request-title">
-              🎵 ${escapeHtml(request.song_request || "")}
-            </div>
+          const time =
+            formatDate(
+              request.created_at
+            );
 
-            <div class="info">
-              <span class="label">👤 Tên khách:</span>
-              ${escapeHtml(request.customer_name || "")}
-            </div>
 
-            <div class="info">
-              <span class="label">🎤 Muốn gửi cho:</span>
-              ${escapeHtml(request.send_to || "")}
-            </div>
+          /* =============================================
+             YOUTUBE BUTTON
+             ============================================= */
 
-            ${
-              request.message
-                ? `
-                  <div class="message">
-                    <span class="label">💬 Lời nhắn:</span><br>
-                    ${escapeHtml(request.message)}
-                  </div>
-                `
-                : ""
-            }
-<div class="time-status">
-  <div class="time">
-    🕐 ${time}
-  </div>
+          const youtubeButton =
+            request.youtube_link
+              ? `
+                <button
+                  class="youtube-btn has-youtube"
+                  onclick="openYoutube('${escapeJs(request.youtube_link)}')">
+                  🎬 YouTube
+                </button>
+              `
+              : `
+                <button
+                  class="youtube-btn"
+                  onclick="doNothing()">
+                  🎬 YouTube
+                </button>
+              `;
 
-  ${
-    request.priority
-      ? `<div class="priority-icon">🚀</div>`
-      : ""
-  }
 
-  <div class="status">
-    ${
-      request.status === "performing"
-        ? "🔵 Đang giao lưu"
-        : request.status === "completed"
-          ? "🟢 Hoàn thành"
-          : "🟡 Đang chờ"
-    }
-  </div>
-</div>
+          return `
 
-            <div class="buttons">
+            <div class="request">
+
+              <div class="request-title">
+                🎵
+                ${escapeHtml(
+                  request.song_request || ""
+                )}
+              </div>
+
+
+              <div class="info">
+                <span class="label">
+                  👤 Tên khách:
+                </span>
+
+                ${escapeHtml(
+                  request.customer_name || ""
+                )}
+              </div>
+
+
+              <div class="info">
+                <span class="label">
+                  🎤 Muốn gửi cho:
+                </span>
+
+                ${escapeHtml(
+                  request.send_to || ""
+                )}
+              </div>
+
 
               ${
-  currentTab === "pending"
-    ? request.status === "performing"
-      ? `
-        <button
-          class="complete-btn"
-          onclick="completeRequest('${request.id}')">
-          ✅ Hoàn thành
-        </button>
-      `
-      : `
-        <button
-          class="complete-btn"
-          onclick="startPerformance('${request.id}')">
-          🎤 Giao lưu
-        </button>
-      `
-    : ""
-}
+                request.message
+                  ? `
+                    <div class="message">
 
-              <button
-                class="delete-btn"
-                onclick="deleteRequest('${request.id}')">
-                🗑 Xóa
-              </button>
+                      <span class="label">
+                        💬 Lời nhắn:
+                      </span>
+
+                      <br>
+
+                      ${escapeHtml(
+                        request.message
+                      )}
+
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              <div class="time-status">
+
+                <div class="time">
+                  🕐 ${time}
+                </div>
+
+
+                ${
+                  request.priority
+                    ? `
+                      <div class="priority-icon">
+                        🚀
+                      </div>
+                    `
+                    : ""
+                }
+
+
+                <div class="status">
+
+                  ${
+                    request.status ===
+                    "performing"
+
+                      ? "🔵 Đang giao lưu"
+
+                      : request.status ===
+                        "completed"
+
+                        ? "🟢 Hoàn thành"
+
+                        : "🟡 Đang chờ"
+                  }
+
+                </div>
+
+              </div>
+
+
+              <div class="buttons">
+
+
+                ${
+                  currentTab === "pending"
+
+                    ? request.status ===
+                      "performing"
+
+                      ? `
+                        <button
+                          class="complete-btn"
+                          onclick="
+                            completeRequest(
+                              '${request.id}'
+                            )
+                          ">
+                          ✅ Hoàn thành
+                        </button>
+                      `
+
+                      : `
+                        <button
+                          class="complete-btn"
+                          onclick="
+                            startPerformance(
+                              '${request.id}'
+                            )
+                          ">
+                          🎤 Giao lưu
+                        </button>
+                      `
+
+                    : ""
+                }
+
+
+                <!-- ===== YOUTUBE ===== -->
+
+                ${youtubeButton}
+
+
+                <!-- ===== XÓA ===== -->
+
+                <button
+                  class="delete-btn"
+                  onclick="
+                    deleteRequest(
+                      '${request.id}'
+                    )
+                  ">
+                  🗑 Xóa
+                </button>
+
+
+              </div>
 
             </div>
 
-          </div>
-        `;
+          `;
 
-      })
-      .join("");
+        })
+        .join("");
 
   }
+
 
   /* =====================================================
-     ĐÁNH DẤU ĐÃ HOÀN THÀNH
+     YOUTUBE
      ===================================================== */
-async function startPerformance(id) {
 
-  const { error } = await supabaseClient
-    .from("requests")
-    .update({
-      status: "performing"
-    })
-    .eq("id", id);
+  function openYoutube(url) {
 
-  if (error) {
-    alert("Không thể bắt đầu giao lưu: " + error.message);
-    return;
+    if (!url) {
+      return;
+    }
+
+    const videoId =
+      getYoutubeVideoId(url);
+
+    if (!videoId) {
+
+      alert(
+        "Link YouTube không hợp lệ."
+      );
+
+      return;
+    }
+
+
+    const frame =
+      document.getElementById(
+        "youtubeFrame"
+      );
+
+
+    frame.src =
+      "https://www.youtube.com/embed/" +
+      videoId +
+      "?autoplay=1&rel=0";
+
+
+    document
+      .getElementById(
+        "youtubeModal"
+      )
+      .style.display =
+        "flex";
+
   }
 
-  lastDataSignature = "";
 
-  await loadRequests(true);
-}
+  /* =====================================================
+     ĐÓNG POPUP YOUTUBE
+     ===================================================== */
+
+  function closeYoutube() {
+
+    const frame =
+      document.getElementById(
+        "youtubeFrame"
+      );
+
+
+    /*
+      Xóa src để video dừng hẳn
+      khi đóng popup.
+    */
+
+    frame.src = "";
+
+
+    document
+      .getElementById(
+        "youtubeModal"
+      )
+      .style.display =
+        "none";
+
+  }
+
+
+  /* =====================================================
+     LẤY ID VIDEO YOUTUBE
+     ===================================================== */
+
+  function getYoutubeVideoId(url) {
+
+    try {
+
+      const parsed =
+        new URL(url);
+
+
+      /* youtube.com/watch?v=XXXX */
+
+      if (
+        parsed.hostname
+          .includes("youtube.com") &&
+        parsed.searchParams.get("v")
+      ) {
+
+        return parsed
+          .searchParams
+          .get("v");
+
+      }
+
+
+      /* youtu.be/XXXX */
+
+      if (
+        parsed.hostname
+          .includes("youtu.be")
+      ) {
+
+        return parsed
+          .pathname
+          .split("/")
+          .filter(Boolean)[0];
+
+      }
+
+
+      /* youtube.com/shorts/XXXX */
+
+      if (
+        parsed.hostname
+          .includes("youtube.com") &&
+        parsed.pathname
+          .startsWith("/shorts/")
+      ) {
+
+        return parsed
+          .pathname
+          .split("/")
+          .filter(Boolean)[1];
+
+      }
+
+
+      return null;
+
+    }
+
+    catch (error) {
+
+      return null;
+
+    }
+
+  }
+
+
+  /* =====================================================
+     NÚT YOUTUBE KHÔNG CÓ LINK
+     ===================================================== */
+
+  function doNothing() {
+
+    // Không làm gì nếu khách không gửi link YouTube
+
+  }
+
+
+  /* =====================================================
+     ĐÁNH DẤU ĐÃ GIAO LƯU
+     ===================================================== */
+
+  async function startPerformance(id) {
+
+    const { error } =
+      await supabaseClient
+        .from("requests")
+        .update({
+          status: "performing"
+        })
+        .eq("id", id);
+
+
+    if (error) {
+
+      alert(
+        "Không thể bắt đầu giao lưu: " +
+        error.message
+      );
+
+      return;
+    }
+
+
+    lastDataSignature = "";
+
+
+    await loadRequests(true);
+
+  }
+
+
   async function completeRequest(id) {
 
     try {
@@ -575,12 +1072,14 @@ async function startPerformance(id) {
           })
           .eq("id", id);
 
+
       if (error) {
         throw error;
       }
 
-      // Reset để chắc chắn danh sách được cập nhật
+
       lastDataSignature = "";
+
 
       await loadRequests(true);
 
@@ -597,6 +1096,7 @@ async function startPerformance(id) {
 
   }
 
+
   /* =====================================================
      XÓA MỘT BÀI
      ===================================================== */
@@ -608,9 +1108,11 @@ async function startPerformance(id) {
         "Anh có chắc muốn xóa bài hát này không?"
       );
 
+
     if (!ok) {
       return;
     }
+
 
     try {
 
@@ -620,11 +1122,14 @@ async function startPerformance(id) {
           .delete()
           .eq("id", id);
 
+
       if (error) {
         throw error;
       }
 
+
       lastDataSignature = "";
+
 
       await loadRequests(true);
 
@@ -640,6 +1145,7 @@ async function startPerformance(id) {
     }
 
   }
+
 
   /* =====================================================
      XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH
@@ -652,9 +1158,11 @@ async function startPerformance(id) {
         "⚠️ Anh có chắc muốn xóa TẤT CẢ bài đã hoàn thành không?"
       );
 
+
     if (!ok) {
       return;
     }
+
 
     try {
 
@@ -662,13 +1170,19 @@ async function startPerformance(id) {
         await supabaseClient
           .from("requests")
           .delete()
-          .eq("status", "completed");
+          .eq(
+            "status",
+            "completed"
+          );
+
 
       if (error) {
         throw error;
       }
 
+
       lastDataSignature = "";
+
 
       await loadRequests(true);
 
@@ -685,6 +1199,7 @@ async function startPerformance(id) {
 
   }
 
+
   /* =====================================================
      ĐỊNH DẠNG THỜI GIAN
      ===================================================== */
@@ -695,8 +1210,12 @@ async function startPerformance(id) {
       return "";
     }
 
+
     const date =
-      new Date(dateString);
+      new Date(
+        dateString
+      );
+
 
     return date.toLocaleString(
       "vi-VN",
@@ -711,6 +1230,7 @@ async function startPerformance(id) {
 
   }
 
+
   /* =====================================================
      CHỐNG HTML
      ===================================================== */
@@ -718,35 +1238,70 @@ async function startPerformance(id) {
   function escapeHtml(value) {
 
     return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
 
   }
+
+
+  /* =====================================================
+     CHỐNG LỖI KHI ĐƯA LINK VÀO ONCLICK
+     ===================================================== */
+
+  function escapeJs(value) {
+
+    return String(value)
+      .replace(
+        /\\/g,
+        "\\\\"
+      )
+      .replace(
+        /'/g,
+        "\\'"
+      )
+      .replace(
+        /"/g,
+        '\\"'
+      )
+      .replace(
+        /\r?\n/g,
+        "\\n"
+      );
+
+  }
+
 
   /* =====================================================
      TỰ ĐỘNG KIỂM TRA DỮ LIỆU
      ===================================================== */
 
-  /*
-     Không cần Supabase Realtime.
-
-     Cứ 2 giây kiểm tra một lần.
-     Nếu có khách gửi bài mới:
-       => admin tự hiện bài mới.
-
-     Nếu có bài được hoàn thành/xóa:
-       => danh sách cũng tự cập nhật.
-  */
-
   setInterval(
     () => {
+
       loadRequests(false);
+
     },
     2000
   );
+
 
   /* =====================================================
      KHỞI ĐỘNG
