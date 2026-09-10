@@ -864,32 +864,53 @@
     const videoId =
       getYoutubeVideoId(url);
 
-    const frame =
-      document.getElementById(
-        "youtubeFrame"
-      );
+
+    /* =========================================
+       CÓ LINK YOUTUBE ĐÚNG
+       => PHÁT TRONG POPUP
+       ========================================= */
 
     if (videoId) {
+
+      const frame =
+        document.getElementById(
+          "youtubeFrame"
+        );
+
 
       frame.src =
         "https://www.youtube.com/embed/" +
         videoId +
         "?autoplay=1&rel=0";
 
-    } else {
 
-      frame.src =
-        "https://www.youtube.com/results?search_query=" +
-        encodeURIComponent(songName);
+      document
+        .getElementById(
+          "youtubeModal"
+        )
+        .style.display =
+          "flex";
+
+
+      return;
 
     }
 
-    document
-      .getElementById(
-        "youtubeModal"
-      )
-      .style.display =
-        "flex";
+
+    /* =========================================
+       KHÔNG CÓ LINK HOẶC LINK SAI
+       => MỞ YOUTUBE SEARCH Ở TAB MỚI
+       ========================================= */
+
+    const searchUrl =
+      "https://www.youtube.com/results?search_query=" +
+      encodeURIComponent(songName);
+
+
+    window.open(
+      searchUrl,
+      "_blank"
+    );
 
   }
 
