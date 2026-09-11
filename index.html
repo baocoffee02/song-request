@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yêu cầu bài hát</title>
+  <title>Phiếu Order</title>
 
   <style>
     * {
@@ -83,7 +83,7 @@
 
   <div class="container">
 
-    <h1>🎵 Yêu cầu bài hát</h1>
+    <h1>🧾 Phiếu Order</h1>
 
     <label>Tên của bạn là:</label>
     <input
@@ -121,13 +121,15 @@
     <button id="submitBtn" onclick="sendRequest()">
       🎵 Gửi yêu cầu
     </button>
+
     <button type="button" onclick="showPriorityConfirm()">
-  🔥 Ưu tiên lên trước
-</button>
+      🔥 Ưu tiên lên trước
+    </button>
 
     <div id="message"></div>
 
   </div>
+
 <div id="priorityModal" style="
   display:none;
   position:fixed;
@@ -169,6 +171,7 @@
     </button>
   </div>
 </div>
+
   <script>
 
     const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
@@ -190,6 +193,7 @@
       
 const youtubeLink =
   document.getElementById("youtube_link").value.trim();
+
       const message =
         document.getElementById("message");
 
@@ -224,27 +228,27 @@ const youtubeLink =
             },
 
             body: JSON.stringify({
-  customer_name: customerName,
-  song_request: songRequest,
-  send_to: sendTo,
-  message: messageText,
-  youtube_link: youtubeLink,
-  priority: isPriority
-})
+              customer_name: customerName,
+              song_request: songRequest,
+              send_to: sendTo,
+              message: messageText,
+              youtube_link: youtubeLink,
+              priority: isPriority
+            })
           }
         );
 
         
         if (!response.ok) {
-  const errorText = await response.text();
+          const errorText = await response.text();
 
-  message.textContent = "❌ " + errorText;
+          message.textContent = "❌ " + errorText;
 
-  console.log("Supabase error:", errorText);
+          console.log("Supabase error:", errorText);
 
-  button.disabled = false;
-  return;
-}
+          button.disabled = false;
+          return;
+        }
 
         window.location.replace("thankyou.html");
 
@@ -266,6 +270,7 @@ const youtubeLink =
 
       }
     }
+
 function showPriorityConfirm() {
   document.getElementById("priorityModal").style.display = "flex";
 }
@@ -280,6 +285,7 @@ function confirmPriority() {
   // Đánh dấu yêu cầu là ưu tiên
   sendRequest(true);
 }
+
   </script>
 
 </body>
