@@ -89,6 +89,13 @@
       font-size: 20px;
       font-weight: bold;
       margin-bottom: 10px;
+
+      /* ===== TÊN BÀI CÓ THỂ BẤM ===== */
+      cursor: pointer;
+    }
+
+    .request-title:active {
+      opacity: 0.6;
     }
 
     .info {
@@ -735,11 +742,20 @@
 
             <div class="request">
 
-              <div class="request-title">
+              <!-- =========================================
+                   TÊN BÀI HÁT
+                   BẤM VÀO => LYRICS MANAGER
+                   ========================================= -->
+
+              <div
+                class="request-title"
+                onclick="openLyrics('${escapeJs(request.song_request || "")}')">
+
                 🎵
                 ${escapeHtml(
                   request.song_request || ""
                 )}
+
               </div>
 
 
@@ -894,6 +910,34 @@
 
 
   /* =====================================================
+     LỜI BÀI HÁT
+     ===================================================== */
+
+  function openLyrics(songName) {
+
+    if (!songName) {
+      return;
+    }
+
+
+    const lyricsUrl =
+      "https://lyrics-manager.baocoffee02.workers.dev/controller?search=" +
+      encodeURIComponent(songName);
+
+
+    /* =========================================
+       CHUYỂN TRANG TRONG CÙNG TAB
+       KHÔNG POPUP
+       KHÔNG MỞ TAB MỚI
+       ========================================= */
+
+    window.location.href =
+      lyricsUrl;
+
+  }
+
+
+  /* =====================================================
      YOUTUBE
      ===================================================== */
 
@@ -936,7 +980,7 @@
 
 
 
-        /* =========================================
+    /* =========================================
        KHÔNG CÓ LINK HOẶC LINK SAI
        => MỞ YOUTUBE SEARCH TRONG CÙNG CỬA SỔ
        ========================================= */
