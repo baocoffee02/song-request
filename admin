@@ -20,7 +20,7 @@
       /* ===== HÌNH NỀN ===== */
       background-image:
         linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-        url("./80E39ED9-E68A-40A0-802C-840E92BDC4B1.jpeg");
+        url("./9C7C692C-3B80-4082-ADEB-46E5C451B8C5.jpeg");
 
       background-size: cover;
       background-position: center;
