@@ -935,9 +935,10 @@
     }
 
 
-    /* =========================================
+
+        /* =========================================
        KHÔNG CÓ LINK HOẶC LINK SAI
-       => MỞ YOUTUBE SEARCH Ở TAB MỚI
+       => MỞ YOUTUBE SEARCH TRONG CÙNG CỬA SỔ
        ========================================= */
 
     const searchUrl =
@@ -945,11 +946,7 @@
       encodeURIComponent(songName);
 
 
-    window.open(
-      searchUrl,
-      "_blank"
-    );
-
+    window.location.href = searchUrl;
   }
 
 
