@@ -38,7 +38,7 @@
     h1 {
       text-align: center;
       color: white;
-      margin: 10px 0 20px;
+      margin: 15px 0 20px;
       text-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
