@@ -489,6 +489,8 @@
 
     updateClearCompletedButton();
 
+    lastDataSignature = "";
+
     loadRequests(true);
   }
 
@@ -537,7 +539,8 @@
             youtube_link,
             priority,
             status,
-            created_at
+            created_at,
+            completed_at
           `)
           .or(
             currentTab === "pending"
@@ -555,7 +558,7 @@
 
 
       /* =================================================
-         SẮP XẾP ƯU TIÊN
+         SẮP XẾP
          ================================================= */
 
       const orderedData =
@@ -563,23 +566,85 @@
           .slice()
           .sort((a, b) => {
 
+
+            /* =========================================
+               TAB ĐÃ HOÀN THÀNH
+               
+               🚀 VẪN HIỂN THỊ
+               nhưng KHÔNG dùng để sắp xếp.
+
+               Bài hoàn thành gần nhất:
+               => ở trên.
+
+               Bài hoàn thành trước:
+               => xuống dưới.
+               ========================================= */
+
+            if (
+              currentTab ===
+              "completed"
+            ) {
+
+              const timeA =
+                a.completed_at
+                  ? new Date(
+                      a.completed_at
+                    ).getTime()
+                  : new Date(
+                      a.created_at
+                    ).getTime();
+
+
+              const timeB =
+                b.completed_at
+                  ? new Date(
+                      b.completed_at
+                    ).getTime()
+                  : new Date(
+                      b.created_at
+                    ).getTime();
+
+
+              return timeB - timeA;
+
+            }
+
+
+            /* =========================================
+               TAB ĐANG CHỜ
+               
+               🚀 ưu tiên lên trước.
+               Trong cùng nhóm:
+               bài order trước ở trên.
+               ========================================= */
+
             if (
               a.priority &&
               !b.priority
             ) {
+
               return -1;
+
             }
+
 
             if (
               !a.priority &&
               b.priority
             ) {
+
               return 1;
+
             }
 
+
             return (
-              new Date(a.created_at) -
-              new Date(b.created_at)
+              new Date(
+                a.created_at
+              ) -
+              new Date(
+                b.created_at
+              )
             );
 
           });
@@ -649,13 +714,9 @@
       }
 
 
-      /*
-        Tạo chuỗi kiểm tra.
-
-        Nếu dữ liệu không thay đổi
-        thì không render lại
-        => tránh màn hình nhấp nháy mỗi 2 giây.
-      */
+      /* =================================================
+         KIỂM TRA DỮ LIỆU CÓ THAY ĐỔI KHÔNG
+         ================================================= */
 
       const signature =
         JSON.stringify(
@@ -668,7 +729,9 @@
           lastDataSignature &&
         !forceRender
       ) {
+
         return;
+
       }
 
 
@@ -734,6 +797,7 @@
       `;
 
       return;
+
     }
 
 
@@ -795,6 +859,7 @@
 
 
               <div class="info">
+
                 <span class="label">
                   👤 Tên khách:
                 </span>
@@ -802,10 +867,12 @@
                 ${escapeHtml(
                   request.customer_name || ""
                 )}
+
               </div>
 
 
               <div class="info">
+
                 <span class="label">
                   🎤 Muốn gửi cho:
                 </span>
@@ -813,6 +880,7 @@
                 ${escapeHtml(
                   request.send_to || ""
                 )}
+
               </div>
 
 
@@ -840,9 +908,15 @@
               <div class="time-status">
 
                 <div class="time">
+
                   🕐 ${time}
+
                 </div>
 
+
+                <!-- =====================================
+                     🚀 VẪN GIỮ BIỂU TƯỢNG ƯU TIÊN
+                     ===================================== -->
 
                 ${
                   request.priority
@@ -889,7 +963,9 @@
                         <button
                           class="complete-btn"
                           onclick="completeRequest('${request.id}')">
+
                           ✅ Kết thúc
+
                         </button>
                       `
 
@@ -901,7 +977,9 @@
                               '${request.id}'
                             )
                           ">
+
                           🎤 Giao lưu
+
                         </button>
                       `
 
@@ -928,7 +1006,9 @@
                       '${request.id}'
                     )
                   ">
+
                   🗑 Xóa
+
                 </button>
 
 
@@ -1064,7 +1144,6 @@
     }
 
 
-
     /* =========================================
        KHÔNG CÓ LINK HOẶC LINK SAI
        => MỞ YOUTUBE SEARCH TRONG CÙNG CỬA SỔ
@@ -1075,7 +1154,8 @@
       encodeURIComponent(songName);
 
 
-    window.location.href = searchUrl;
+    window.location.href =
+      searchUrl;
 
   }
 
@@ -1091,11 +1171,6 @@
         "youtubeFrame"
       );
 
-
-    /*
-      Xóa src để video dừng hẳn
-      khi đóng popup.
-    */
 
     frame.src = "";
 
@@ -1224,6 +1299,7 @@
       );
 
       return;
+
     }
 
 
@@ -1235,6 +1311,10 @@
   }
 
 
+  /* =====================================================
+     HOÀN THÀNH REQUEST
+     ===================================================== */
+
   async function completeRequest(id) {
 
     try {
@@ -1243,13 +1323,24 @@
         await supabaseClient
           .from("requests")
           .update({
-            status: "completed"
+
+            status:
+              "completed",
+
+            completed_at:
+              new Date().toISOString()
+
           })
-          .eq("id", id);
+          .eq(
+            "id",
+            id
+          );
 
 
       if (error) {
+
         throw error;
+
       }
 
 
@@ -1285,7 +1376,9 @@
 
 
     if (!ok) {
+
       return;
+
     }
 
 
@@ -1295,11 +1388,16 @@
         await supabaseClient
           .from("requests")
           .delete()
-          .eq("id", id);
+          .eq(
+            "id",
+            id
+          );
 
 
       if (error) {
+
         throw error;
+
       }
 
 
@@ -1335,7 +1433,9 @@
 
 
     if (!ok) {
+
       return;
+
     }
 
 
@@ -1352,7 +1452,9 @@
 
 
       if (error) {
+
         throw error;
+
       }
 
 
@@ -1382,7 +1484,9 @@
   function formatDate(dateString) {
 
     if (!dateString) {
+
       return "";
+
     }
 
 
@@ -1395,11 +1499,22 @@
     return date.toLocaleString(
       "vi-VN",
       {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+
+        day:
+          "2-digit",
+
+        month:
+          "2-digit",
+
+        year:
+          "numeric",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit"
+
       }
     );
 
@@ -1413,22 +1528,27 @@
   function escapeHtml(value) {
 
     return String(value)
+
       .replace(
         /&/g,
         "&amp;"
       )
+
       .replace(
         /</g,
         "&lt;"
       )
+
       .replace(
         />/g,
         "&gt;"
       )
+
       .replace(
         /"/g,
         "&quot;"
       )
+
       .replace(
         /'/g,
         "&#039;"
@@ -1444,18 +1564,22 @@
   function escapeJs(value) {
 
     return String(value)
+
       .replace(
         /\\/g,
         "\\\\"
       )
+
       .replace(
         /'/g,
         "\\'"
       )
+
       .replace(
         /"/g,
         '\\"'
       )
+
       .replace(
         /\r?\n/g,
         "\\n"
