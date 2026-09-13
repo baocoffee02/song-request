@@ -431,6 +431,41 @@
 
 
   /* =====================================================
+     REALTIME ĐIỀU KHIỂN DISPLAY LỜI BÀI HÁT
+     ===================================================== */
+
+  const lyricsControlChannel =
+    supabaseClient.channel("lyrics-control");
+
+
+  let lyricsControlReady =
+    new Promise((resolve) => {
+
+      lyricsControlChannel.subscribe(
+        (status) => {
+
+          console.log(
+            "Lyrics Realtime:",
+            status
+          );
+
+
+          if (
+            status ===
+            "SUBSCRIBED"
+          ) {
+
+            resolve();
+
+          }
+
+        }
+      );
+
+    });
+
+
+  /* =====================================================
      HIỂN THỊ TAB
      ===================================================== */
 
@@ -744,7 +779,7 @@
 
               <!-- =========================================
                    TÊN BÀI HÁT
-                   BẤM VÀO => LYRICS MANAGER
+                   BẤM VÀO => GỬI SANG DISPLAY + CONTROLLER
                    ========================================= -->
 
               <div
@@ -913,23 +948,73 @@
      LỜI BÀI HÁT
      ===================================================== */
 
-  function openLyrics(songName) {
+  async function openLyrics(songName) {
 
     if (!songName) {
       return;
     }
 
 
+    /* =========================================
+       CHỜ REALTIME KẾT NỐI
+       ========================================= */
+
+    try {
+
+      await lyricsControlReady;
+
+
+      /* =========================================
+         GỬI LỆNH TÌM KIẾM SANG DISPLAY
+         ========================================= */
+
+      const result =
+        await lyricsControlChannel.send({
+
+          type: "broadcast",
+
+          event: "show-search",
+
+          payload: {
+
+            query:
+              songName +
+              " lyrics",
+
+            song_title:
+              songName
+
+          }
+
+        });
+
+
+      console.log(
+        "Đã gửi tìm kiếm sang Display:",
+        result
+      );
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Không gửi được lệnh sang Display:",
+        error
+      );
+
+    }
+
+
+    /* =========================================
+       SAU KHI GỬI DISPLAY
+       => CHUYỂN SANG CONTROLLER
+       ========================================= */
+
     const lyricsUrl =
       "https://lyrics-manager.baocoffee02.workers.dev/controller?search=" +
       encodeURIComponent(songName);
 
-
-    /* =========================================
-       CHUYỂN TRANG TRONG CÙNG TAB
-       KHÔNG POPUP
-       KHÔNG MỞ TAB MỚI
-       ========================================= */
 
     window.location.href =
       lyricsUrl;
@@ -991,6 +1076,7 @@
 
 
     window.location.href = searchUrl;
+
   }
 
 
