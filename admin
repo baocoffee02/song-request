@@ -16,16 +16,24 @@
     body {
   margin: 0;
   font-family: Arial, sans-serif;
+  min-height: 100vh;
+  background: #888;
+}
 
-  /* ===== HÌNH NỀN ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
   background-image:
     linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
     url("./9C7C692C-3B80-4082-ADEB-46E5C451B8C5.jpeg");
 
   background-size: cover;
   background-position: center top;
-  background-attachment: scroll;
-  min-height: 100vh;
+  background-repeat: no-repeat;
+
+  z-index: -1;
 }
 
     .container {
