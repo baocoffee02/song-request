@@ -56,5 +56,17 @@
 
 <body>
 
+<script>
+  /* =====================================================
+     CHẶN QUAY LẠI TRANG ORDER
+     ===================================================== */
+
+  history.pushState(null, "", location.href);
+
+  window.addEventListener("popstate", function () {
+    history.pushState(null, "", location.href);
+  });
+</script>
+
 </body>
 </html>
