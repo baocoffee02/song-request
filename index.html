@@ -11,17 +11,18 @@
     }
 
     body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
 
-  background:
-    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-    url("./9C7C692C-3B80-4082-ADEB-46E5C451B8C5.jpeg")
-    center top / cover no-repeat;
+      background:
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        url("./9C7C692C-3B80-4082-ADEB-46E5C451B8C5.jpeg")
+        center top / cover no-repeat;
 
-  background-attachment: scroll;
-}
+      background-attachment: scroll;
+    }
+
     .container {
       max-width: 500px;
       margin: 0 auto;
@@ -71,11 +72,25 @@
       opacity: 0.6;
     }
 
-  #message {
-  text-align: center;
-  margin-top: 45px;
-  font-weight: bold;
-}
+    #message {
+      text-align: center;
+      margin-top: 45px;
+      font-weight: bold;
+    }
+
+    /* =====================================================
+       THÔNG BÁO KHI ĐÓNG ORDER
+       ===================================================== */
+
+    #orderClosed {
+      display: none;
+      text-align: center;
+      padding-top: 80px;
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+
   </style>
 </head>
 
@@ -83,211 +98,525 @@
 
   <div class="container">
 
-    <h1>🧾 Phiếu Order</h1>
+    <!-- =====================================================
+         FORM ORDER
+         ===================================================== -->
 
-    <label>Tên của bạn là:</label>
-    <input
-      id="customer_name"
-      type="text"
-      placeholder="Nhập tên của bạn"
-    >
+    <div id="orderForm">
 
-    <label>Bài hát muốn nghe / hát:</label>
-    <input
-      id="song_request"
-      type="text"
-      placeholder="Nhập tên bài hát"
-    >
+      <h1>🧾 Phiếu Order</h1>
 
-    <label>Muốn gửi đến:</label>
-    <input
-      id="send_to"
-      type="text"
-      placeholder="Nhập tên người muốn gửi"
-    >
+      <label>Tên của bạn là:</label>
 
-    <label>Với lời nhắn:</label>
-    <textarea
-      id="message_text"
-      placeholder="Nhập lời nhắn..."
-    ></textarea>
+      <input
+        id="customer_name"
+        type="text"
+        placeholder="Nhập tên của bạn"
+      >
 
-    <div style="
-      text-align:center;
-      margin-top:20px;
-      font-weight:bold;
-      color:#111;
-    ">
-      Lưu ý: Không có hát karaoke YouTube ạ. ❤️
+
+      <label>Bài hát muốn nghe / hát:</label>
+
+      <input
+        id="song_request"
+        type="text"
+        placeholder="Nhập tên bài hát"
+      >
+
+
+      <label>Muốn gửi đến:</label>
+
+      <input
+        id="send_to"
+        type="text"
+        placeholder="Nhập tên người muốn gửi"
+      >
+
+
+      <label>Với lời nhắn:</label>
+
+      <textarea
+        id="message_text"
+        placeholder="Nhập lời nhắn..."
+      ></textarea>
+
+
+      <div style="
+        text-align:center;
+        margin-top:20px;
+        font-weight:bold;
+        color:#111;
+      ">
+        Lưu ý: Không có hát karaoke YouTube ạ. ❤️
+      </div>
+
+
+      <button
+        id="submitBtn"
+        onclick="sendRequest()">
+        🎵 Gửi yêu cầu
+      </button>
+
+
+      <button
+        type="button"
+        onclick="showPriorityConfirm()">
+        🔥 Ưu tiên lên trước
+      </button>
+
+
+      <div id="message"></div>
+
     </div>
 
-    <button id="submitBtn" onclick="sendRequest()">
-      🎵 Gửi yêu cầu
-    </button>
 
-    <button type="button" onclick="showPriorityConfirm()">
-      🔥 Ưu tiên lên trước
-    </button>
+    <!-- =====================================================
+         THÔNG BÁO ĐÓNG ORDER
+         ===================================================== -->
 
-    <div id="message"></div>
+    <div id="orderClosed">
+
+      Xin lỗi quý khách.<br>
+      Hiện tại thời gian order bài hát đã hết ạ.
+
+    </div>
 
   </div>
 
-<div id="priorityModal" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  z-index:9999;
-  align-items:center;
-  justify-content:center;
-">
-  <div style="
-    background:white;
-    width:90%;
-    max-width:400px;
-    padding:25px;
-    border-radius:15px;
-    text-align:center;
-  ">
-    <h3>🔥 Ưu tiên lên trước</h3>
 
-    <p>
-      Bạn có sẵn lòng tip 1man cho band để được ưu tiên lên trước không?
-  Tiền mặt nha. 🥰
-    </p>
+  <!-- =====================================================
+       POPUP ƯU TIÊN
+       ===================================================== -->
 
-    <button
-      type="button"
-      onclick="confirmPriority()"
-      style="width:100%; padding:12px; margin-top:10px;"
-    >
-      Đồng ý
-    </button>
+  <div
+    id="priorityModal"
+    style="
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.6);
+      z-index:9999;
+      align-items:center;
+      justify-content:center;
+    "
+  >
 
-    <button
-      type="button"
-      onclick="closePriority()"
-      style="width:100%; padding:12px; margin-top:8px;"
-    >
-      Hủy
-    </button>
+    <div style="
+      background:white;
+      width:90%;
+      max-width:400px;
+      padding:25px;
+      border-radius:15px;
+      text-align:center;
+    ">
+
+      <h3>🔥 Ưu tiên lên trước</h3>
+
+      <p>
+        Bạn có sẵn lòng tip 1man cho band để được ưu tiên lên trước không?
+        Tiền mặt nha. 🥰
+      </p>
+
+
+      <button
+        type="button"
+        onclick="confirmPriority()"
+        style="
+          width:100%;
+          padding:12px;
+          margin-top:10px;
+        "
+      >
+        Đồng ý
+      </button>
+
+
+      <button
+        type="button"
+        onclick="closePriority()"
+        style="
+          width:100%;
+          padding:12px;
+          margin-top:8px;
+        "
+      >
+        Hủy
+      </button>
+
+    </div>
+
   </div>
-</div>
+
 
   <script>
 
-    const SUPABASE_URL = "https://ehvaahtsqxoscusanksj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
+    /* =====================================================
+       SUPABASE
+       ===================================================== */
 
-    async function sendRequest(isPriority = false) {
+    const SUPABASE_URL =
+      "https://ehvaahtsqxoscusanksj.supabase.co";
 
-      const customerName =
-        document.getElementById("customer_name").value.trim();
+    const SUPABASE_KEY =
+      "sb_publishable_WmtNVF8-FRnB60urP86nBA_O7qnbKyt";
 
-      const songRequest =
-        document.getElementById("song_request").value.trim();
 
-      const sendTo =
-        document.getElementById("send_to").value.trim();
+    /* =====================================================
+       TRẠNG THÁI ORDER
+       ===================================================== */
 
-      const messageText =
-        document.getElementById("message_text").value.trim();
-      
-const youtubeLink =
-  document.getElementById("youtube_link").value.trim();
+    let orderIsOpen = true;
 
-      const message =
-        document.getElementById("message");
 
-      const button =
-        document.getElementById("submitBtn");
+    /* =====================================================
+       KIỂM TRA ORDER ĐANG MỞ HAY ĐÓNG
+       ===================================================== */
 
-      if (!customerName) {
-        message.textContent = "⚠️ Bạn hãy nhập tên.";
-        return;
-      }
+    async function checkOrderStatus() {
 
-      if (!songRequest) {
-        message.textContent = "⚠️ Bạn hãy nhập tên bài hát.";
-        return;
-      }
+      const orderForm =
+        document.getElementById("orderForm");
 
-      button.disabled = true;
-      message.textContent = "Đang gửi...";
+      const orderClosed =
+        document.getElementById("orderClosed");
+
 
       try {
 
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/requests`,
-          {
-            method: "POST",
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/order_control?id=eq.1&select=is_open`,
+            {
+              method: "GET",
 
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`,
-              "Content-Type": "application/json",
-              "Prefer": "return=minimal"
-            },
+              headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`
+              }
+            }
+          );
 
-            body: JSON.stringify({
-              customer_name: customerName,
-              song_request: songRequest,
-              send_to: sendTo,
-              message: messageText,
-              youtube_link: youtubeLink,
-              priority: isPriority
-            })
-          }
-        );
 
-        
         if (!response.ok) {
-          const errorText = await response.text();
 
-          message.textContent = "❌ " + errorText;
+          console.error(
+            "Không thể kiểm tra trạng thái order:",
+            await response.text()
+          );
 
-          console.log("Supabase error:", errorText);
-
-          button.disabled = false;
           return;
+
         }
 
-        window.location.replace("thankyou.html");
 
-        document.getElementById("customer_name").value = "";
-        document.getElementById("song_request").value = "";
-        document.getElementById("send_to").value = "";
-        document.getElementById("message_text").value = "";
+        const data =
+          await response.json();
 
-      } catch (error) {
+
+        if (
+          !data ||
+          !data.length
+        ) {
+
+          return;
+
+        }
+
+
+        orderIsOpen =
+          data[0].is_open === true;
+
+
+        if (orderIsOpen) {
+
+          orderForm.style.display =
+            "block";
+
+          orderClosed.style.display =
+            "none";
+
+        } else {
+
+          orderForm.style.display =
+            "none";
+
+          orderClosed.style.display =
+            "block";
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Lỗi kiểm tra trạng thái order:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* =====================================================
+       GỬI REQUEST
+       ===================================================== */
+
+    async function sendRequest(
+      isPriority = false
+    ) {
+
+      /* =========================================
+         KHÔNG CHO GỬI KHI ĐÃ ĐÓNG ORDER
+         ========================================= */
+
+      if (!orderIsOpen) {
+
+        return;
+
+      }
+
+
+      const customerName =
+        document
+          .getElementById("customer_name")
+          .value
+          .trim();
+
+
+      const songRequest =
+        document
+          .getElementById("song_request")
+          .value
+          .trim();
+
+
+      const sendTo =
+        document
+          .getElementById("send_to")
+          .value
+          .trim();
+
+
+      const messageText =
+        document
+          .getElementById("message_text")
+          .value
+          .trim();
+
+
+      const message =
+        document.getElementById(
+          "message"
+        );
+
+
+      const button =
+        document.getElementById(
+          "submitBtn"
+        );
+
+
+      if (!customerName) {
+
+        message.textContent =
+          "⚠️ Bạn hãy nhập tên.";
+
+        return;
+
+      }
+
+
+      if (!songRequest) {
+
+        message.textContent =
+          "⚠️ Bạn hãy nhập tên bài hát.";
+
+        return;
+
+      }
+
+
+      button.disabled = true;
+
+      message.textContent =
+        "Đang gửi...";
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/requests`,
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "apikey":
+                  SUPABASE_KEY,
+
+                "Authorization":
+                  `Bearer ${SUPABASE_KEY}`,
+
+                "Content-Type":
+                  "application/json",
+
+                "Prefer":
+                  "return=minimal"
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  customer_name:
+                    customerName,
+
+                  song_request:
+                    songRequest,
+
+                  send_to:
+                    sendTo,
+
+                  message:
+                    messageText,
+
+                  priority:
+                    isPriority
+
+                })
+
+            }
+          );
+
+
+        if (!response.ok) {
+
+          const errorText =
+            await response.text();
+
+
+          message.textContent =
+            "❌ " + errorText;
+
+
+          console.log(
+            "Supabase error:",
+            errorText
+          );
+
+
+          button.disabled =
+            false;
+
+          return;
+
+        }
+
+
+        window.location.replace(
+          "thankyou.html"
+        );
+
+
+        document
+          .getElementById(
+            "customer_name"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "song_request"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "send_to"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "message_text"
+          )
+          .value = "";
+
+      }
+
+      catch (error) {
 
         console.error(error);
 
         message.textContent =
           "❌ Không gửi được yêu cầu. Vui lòng thử lại.";
 
-      } finally {
+      }
 
-        button.disabled = false;
+      finally {
+
+        button.disabled =
+          false;
 
       }
+
     }
 
-function showPriorityConfirm() {
-  document.getElementById("priorityModal").style.display = "flex";
-}
 
-function closePriority() {
-  document.getElementById("priorityModal").style.display = "none";
-}
+    /* =====================================================
+       POPUP ƯU TIÊN
+       ===================================================== */
 
-function confirmPriority() {
-  closePriority();
+    function showPriorityConfirm() {
 
-  // Đánh dấu yêu cầu là ưu tiên
-  sendRequest(true);
-}
+      if (!orderIsOpen) {
+        return;
+      }
+
+
+      document
+        .getElementById(
+          "priorityModal"
+        )
+        .style.display =
+          "flex";
+
+    }
+
+
+    function closePriority() {
+
+      document
+        .getElementById(
+          "priorityModal"
+        )
+        .style.display =
+          "none";
+
+    }
+
+
+    function confirmPriority() {
+
+      closePriority();
+
+      sendRequest(true);
+
+    }
+
+
+    /* =====================================================
+       KHỞI ĐỘNG
+       ===================================================== */
+
+    checkOrderStatus();
 
   </script>
 
