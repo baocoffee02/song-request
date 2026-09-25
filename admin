@@ -14,27 +14,27 @@
     }
 
     body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  min-height: 100vh;
-  background: #888;
-}
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background: #888;
+    }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
 
-  background-image:
-    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
-    url("./9C7C692C-3B80-4082-ADEB-46E5C451B8C5.jpeg");
+      background-image:
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        url("./9C7C692C-3B80-4082-ADEB-46E5C451B8C5.jpeg");
 
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
 
-  z-index: -1;
-}
+      z-index: -1;
+    }
 
     .container {
       width: 100%;
@@ -50,26 +50,73 @@ body::before {
       text-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
+    /* =====================================================
+       TAB + NÚT ĐÓNG / NHẬN
+       ===================================================== */
+
     .tabs {
       display: flex;
       gap: 10px;
       margin-bottom: 15px;
+      align-items: stretch;
     }
 
     .tab {
       flex: 1;
-      padding: 13px;
+      height: 48px;
+      padding: 0 10px;
       border: none;
       border-radius: 10px;
       background: rgba(255,255,255,0.85);
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .tab.active {
       background: #222;
       color: white;
+    }
+
+    /* =====================================================
+       NÚT ĐÓNG / NHẬN ORDER
+       ===================================================== */
+
+    .order-control-button {
+      flex: 0 0 auto;
+      width: 72px;
+      height: 48px;
+
+      padding: 0 8px;
+
+      border: none;
+      border-radius: 10px;
+
+      color: white;
+
+      font-size: 15px;
+      font-weight: bold;
+
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .order-control-button.open {
+      background: #e74c3c;
+    }
+
+    .order-control-button.closed {
+      background: #27ae60;
+    }
+
+    .order-control-button:active {
+      opacity: 0.8;
+    }
+
+    .order-control-button:disabled {
+      opacity: 0.6;
+      cursor: wait;
     }
 
     .clear-completed {
@@ -357,7 +404,19 @@ body::before {
       Đã hoàn thành <span id="completedCount">0</span>
     </button>
 
+    <!-- =================================================
+         NÚT ĐÓNG / NHẬN
+         ================================================= -->
+
+    <button
+      id="orderControlButton"
+      class="order-control-button open"
+      onclick="toggleOrderStatus()">
+      Đóng
+    </button>
+
   </div>
+
 
   <button
     id="clearCompletedButton"
@@ -437,6 +496,8 @@ body::before {
 
   let lastDataSignature = "";
 
+  let orderIsOpen = true;
+
 
   /* =====================================================
      REALTIME ĐIỀU KHIỂN DISPLAY LỜI BÀI HÁT
@@ -471,6 +532,155 @@ body::before {
       );
 
     });
+
+
+  /* =====================================================
+     TRẠNG THÁI NHẬN ORDER
+     ===================================================== */
+
+  async function loadOrderStatus() {
+
+    try {
+
+      const { data, error } =
+        await supabaseClient
+          .from("order_control")
+          .select("is_open")
+          .eq("id", 1)
+          .single();
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      orderIsOpen =
+        data.is_open;
+
+
+      updateOrderControlButton();
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Không thể tải trạng thái order:",
+        error
+      );
+
+    }
+
+  }
+
+
+  function updateOrderControlButton() {
+
+    const button =
+      document.getElementById(
+        "orderControlButton"
+      );
+
+
+    if (!button) {
+      return;
+    }
+
+
+    if (orderIsOpen) {
+
+      button.className =
+        "order-control-button open";
+
+      button.textContent =
+        "Đóng";
+
+    } else {
+
+      button.className =
+        "order-control-button closed";
+
+      button.textContent =
+        "Nhận";
+
+    }
+
+  }
+
+
+  async function toggleOrderStatus() {
+
+    const newStatus =
+      !orderIsOpen;
+
+
+    const confirmText =
+      newStatus
+        ? "Bạn có chắc muốn MỞ NHẬN ORDER bài hát không?"
+        : "Bạn có chắc muốn ĐÓNG NHẬN ORDER bài hát không?";
+
+
+    const ok =
+      confirm(confirmText);
+
+
+    if (!ok) {
+      return;
+    }
+
+
+    const button =
+      document.getElementById(
+        "orderControlButton"
+      );
+
+
+    button.disabled = true;
+
+
+    try {
+
+      const { error } =
+        await supabaseClient
+          .from("order_control")
+          .update({
+            is_open: newStatus
+          })
+          .eq("id", 1);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      orderIsOpen =
+        newStatus;
+
+
+      updateOrderControlButton();
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+      alert(
+        "❌ Không thể thay đổi trạng thái order:\n" +
+        error.message
+      );
+
+    }
+
+    finally {
+
+      button.disabled = false;
+
+    }
+
+  }
 
 
   /* =====================================================
@@ -577,7 +787,7 @@ body::before {
 
             /* =========================================
                TAB ĐÃ HOÀN THÀNH
-               
+
                🚀 VẪN HIỂN THỊ
                nhưng KHÔNG dùng để sắp xếp.
 
@@ -620,7 +830,7 @@ body::before {
 
             /* =========================================
                TAB ĐANG CHỜ
-               
+
                🚀 ưu tiên lên trước.
                Trong cùng nhóm:
                bài order trước ở trên.
@@ -1615,6 +1825,8 @@ body::before {
      ===================================================== */
 
   updateClearCompletedButton();
+
+  loadOrderStatus();
 
   loadRequests(true);
 
