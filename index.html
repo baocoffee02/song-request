@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -79,16 +80,24 @@
     }
 
     /* =====================================================
-       THÔNG BÁO KHI ĐÓNG ORDER
+       ẢNH QUẢNG CÁO KHI ĐÓNG ORDER
        ===================================================== */
 
     #orderClosed {
       display: none;
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      padding: 0;
       text-align: center;
-      padding-top: 80px;
-      font-size: 20px;
-      font-weight: bold;
-      line-height: 1.6;
+    }
+
+    #orderClosed img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: none;
+      margin: 0;
+      object-fit: contain;
     }
 
   </style>
@@ -114,7 +123,6 @@
         placeholder="Nhập tên của bạn"
       >
 
-
       <label>Bài hát muốn nghe / hát:</label>
 
       <input
@@ -122,7 +130,6 @@
         type="text"
         placeholder="Nhập tên bài hát"
       >
-
 
       <label>Muốn gửi đến:</label>
 
@@ -132,14 +139,12 @@
         placeholder="Nhập tên người muốn gửi"
       >
 
-
       <label>Với lời nhắn:</label>
 
       <textarea
         id="message_text"
         placeholder="Nhập lời nhắn..."
       ></textarea>
-
 
       <div style="
         text-align:center;
@@ -150,13 +155,11 @@
         Lưu ý: Không có hát karaoke YouTube ạ. ❤️
       </div>
 
-
       <button
         id="submitBtn"
         onclick="sendRequest()">
         🎵 Gửi yêu cầu
       </button>
-
 
       <button
         type="button"
@@ -164,20 +167,21 @@
         🔥 Ưu tiên lên trước
       </button>
 
-
       <div id="message"></div>
 
     </div>
 
 
     <!-- =====================================================
-         THÔNG BÁO ĐÓNG ORDER
+         ẢNH QUẢNG CÁO KHI ĐÓNG ORDER
          ===================================================== -->
 
     <div id="orderClosed">
 
-      Xin lỗi quý khách.<br>
-      Hiện tại thời gian order bài hát đã hết ạ.
+      <img
+        src="./images/quang-cao/FBB7870D-9EAC-4C86-B79B-A71DD0C2429A.png"
+        alt="Thông báo và quảng cáo Bao Coffee"
+      >
 
     </div>
 
@@ -217,7 +221,6 @@
         Tiền mặt nha. 🥰
       </p>
 
-
       <button
         type="button"
         onclick="confirmPriority()"
@@ -229,7 +232,6 @@
       >
         Đồng ý
       </button>
-
 
       <button
         type="button"
@@ -280,7 +282,6 @@
       const orderClosed =
         document.getElementById("orderClosed");
 
-
       try {
 
         const response =
@@ -296,7 +297,6 @@
             }
           );
 
-
         if (!response.ok) {
 
           console.error(
@@ -308,10 +308,8 @@
 
         }
 
-
         const data =
           await response.json();
-
 
         if (
           !data ||
@@ -322,10 +320,8 @@
 
         }
 
-
         orderIsOpen =
           data[0].is_open === true;
-
 
         if (orderIsOpen) {
 
@@ -367,9 +363,7 @@
       isPriority = false
     ) {
 
-      /* =========================================
-         KHÔNG CHO GỬI KHI ĐÃ ĐÓNG ORDER
-         ========================================= */
+      /* KHÔNG CHO GỬI KHI ĐÃ ĐÓNG ORDER */
 
       if (!orderIsOpen) {
 
@@ -377,13 +371,11 @@
 
       }
 
-
       const customerName =
         document
           .getElementById("customer_name")
           .value
           .trim();
-
 
       const songRequest =
         document
@@ -391,13 +383,11 @@
           .value
           .trim();
 
-
       const sendTo =
         document
           .getElementById("send_to")
           .value
           .trim();
-
 
       const messageText =
         document
@@ -405,18 +395,15 @@
           .value
           .trim();
 
-
       const message =
         document.getElementById(
           "message"
         );
 
-
       const button =
         document.getElementById(
           "submitBtn"
         );
-
 
       if (!customerName) {
 
@@ -427,7 +414,6 @@
 
       }
 
-
       if (!songRequest) {
 
         message.textContent =
@@ -437,12 +423,10 @@
 
       }
 
-
       button.disabled = true;
 
       message.textContent =
         "Đang gửi...";
-
 
       try {
 
@@ -492,22 +476,18 @@
             }
           );
 
-
         if (!response.ok) {
 
           const errorText =
             await response.text();
 
-
           message.textContent =
             "❌ " + errorText;
-
 
           console.log(
             "Supabase error:",
             errorText
           );
-
 
           button.disabled =
             false;
@@ -516,11 +496,9 @@
 
         }
 
-
         window.location.replace(
           "thankyou.html"
         );
-
 
         document
           .getElementById(
@@ -528,20 +506,17 @@
           )
           .value = "";
 
-
         document
           .getElementById(
             "song_request"
           )
           .value = "";
 
-
         document
           .getElementById(
             "send_to"
           )
           .value = "";
-
 
         document
           .getElementById(
@@ -579,7 +554,6 @@
       if (!orderIsOpen) {
         return;
       }
-
 
       document
         .getElementById(
