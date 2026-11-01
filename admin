@@ -204,6 +204,74 @@
       font-size: 13px;
       font-weight: bold;
     }
+
+    /* =====================================================
+       GIAO DIỆN RIÊNG CHO MỤC ĐÃ HOÀN THÀNH
+       ===================================================== */
+
+    .completed-song-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      padding: 11px 12px;
+      margin-bottom: 9px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .completed-song-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .completed-song-name {
+      font-size: 16px;
+      font-weight: bold;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .completed-song-count {
+      flex-shrink: 0;
+      color: #1769c2;
+      font-size: 15px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .completed-song-buttons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 7px;
+    }
+
+    .completed-song-buttons button {
+      flex: 0 0 auto !important;
+      width: auto !important;
+      height: 25px !important;
+      padding: 2px 5px !important;
+      margin: 0 !important;
+      border: none;
+      border-radius: 4px !important;
+      font-size: 11px !important;
+      line-height: 1;
+      font-weight: bold;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .completed-song-buttons .youtube-btn,
+    .completed-song-buttons .chord-btn {
+      background: #27ae60;
+      color: white;
+    }
+
+    .completed-song-buttons .delete-btn {
+      background: #e74c3c;
+      color: white;
+    }
+
   </style>
 </head>
 <body>
@@ -252,10 +320,12 @@
       SUPABASE_URL,
       SUPABASE_ANON_KEY
     );
+
   /* BIẾN */
   let currentTab = "pending";
   let lastDataSignature = "";
   let orderIsOpen = true;
+
   /* REALTIME ĐIỀU KHIỂN DISPLAY */
   const lyricsControlChannel =
     supabaseClient.channel("lyrics-control");
@@ -268,6 +338,7 @@
         }
       });
     });
+
   /* TRẠNG THÁI NHẬN ORDER */
   async function loadOrderStatus() {
     try {
@@ -287,6 +358,7 @@
       );
     }
   }
+
   function updateOrderControlButton() {
     const button =
       document.getElementById("orderControlButton");
@@ -299,6 +371,7 @@
       button.textContent = "Nhận";
     }
   }
+
   async function toggleOrderStatus() {
     const newStatus = !orderIsOpen;
     const confirmText = newStatus
@@ -327,6 +400,7 @@
       button.disabled = false;
     }
   }
+
   /* HIỂN THỊ TAB */
   function showTab(tab) {
     currentTab = tab;
@@ -340,6 +414,7 @@
     lastDataSignature = "";
     loadRequests(true);
   }
+
   /* NÚT XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH */
   function updateClearCompletedButton() {
     const button =
@@ -347,6 +422,7 @@
     button.style.display =
       currentTab === "completed" ? "block" : "none";
   }
+
   /* TẢI DANH SÁCH */
   async function loadRequests(forceRender = false) {
     try {
@@ -370,7 +446,9 @@
               : "status.eq.completed"
           )
           .order("created_at", { ascending: true });
+
       if (error) throw error;
+
       /* SẮP XẾP */
       const orderedData = (data || [])
         .slice()
@@ -389,6 +467,7 @@
           return new Date(a.created_at) -
                  new Date(b.created_at);
         });
+
       /* ĐẾM BÀI ĐANG CHỜ */
       const {
         count: pendingCount,
@@ -397,10 +476,12 @@
         .from("requests")
         .select("*", { count: "exact", head: true })
         .eq("status", "pending");
+
       if (!pendingError) {
         document.getElementById("pendingCount").textContent =
           pendingCount || 0;
       }
+
       /* ĐẾM BÀI ĐÃ HOÀN THÀNH */
       const {
         count: completedCount,
@@ -409,10 +490,12 @@
         .from("requests")
         .select("*", { count: "exact", head: true })
         .eq("status", "completed");
+
       if (!completedError) {
         document.getElementById("completedCount").textContent =
           completedCount || 0;
       }
+
       /* KIỂM TRA DỮ LIỆU THAY ĐỔI */
       const signature = JSON.stringify(data || []);
       if (signature === lastDataSignature && !forceRender) {
@@ -420,6 +503,7 @@
       }
       lastDataSignature = signature;
       renderRequests(orderedData);
+
     } catch (error) {
       console.error(error);
       document.getElementById("errorBox").innerHTML = `
@@ -432,9 +516,66 @@
       `;
     }
   }
-  /* HIỂN THỊ REQUEST */
+
+  /* =====================================================
+     CHUẨN HÓA TÊN BÀI HÁT
+     ===================================================== */
+
+  function normalizeSongName(name) {
+    return String(name || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  /* CÁC BIẾN THỂ TÊN BÀI ĐÃ BIẾT */
+  const songAliases = {
+    "co don tren sofa": "Cô Đơn Trên Sofa",
+    "co don tren so pha": "Cô Đơn Trên Sofa"
+  };
+
+  /* TÊN BÀI HIỂN THỊ */
+  function getSongDisplayName(songName) {
+    const normalized = normalizeSongName(songName);
+
+    if (songAliases[normalized]) {
+      return songAliases[normalized];
+    }
+
+    return String(songName || "")
+      .trim()
+      .toLocaleLowerCase("vi-VN")
+      .split(/\s+/)
+      .map(word => {
+        if (!word) return "";
+        return word.charAt(0).toLocaleUpperCase("vi-VN") +
+          word.slice(1);
+      })
+      .join(" ");
+  }
+
+  /* KHÓA GỘP BÀI HÁT */
+  function getSongGroupKey(songName) {
+    const normalized = normalizeSongName(songName);
+
+    if (songAliases[normalized]) {
+      return normalizeSongName(songAliases[normalized]);
+    }
+
+    return normalized;
+  }
+
+  /* =====================================================
+     HIỂN THỊ REQUEST
+     ===================================================== */
+
   function renderRequests(data) {
     const box = document.getElementById("requests");
+
     if (!data.length) {
       box.innerHTML = `
         <div class="empty">
@@ -447,8 +588,96 @@
       `;
       return;
     }
+
+    /* =====================================================
+       RIÊNG MỤC ĐÃ HOÀN THÀNH
+       GỘP BÀI HÁT + ĐẾM SỐ LẦN ORDER
+       ===================================================== */
+
+    if (currentTab === "completed") {
+
+      const songGroups = new Map();
+
+      data.forEach(request => {
+        const songName = request.song_request || "";
+        const groupKey = getSongGroupKey(songName);
+
+        if (!songGroups.has(groupKey)) {
+          songGroups.set(groupKey, {
+            name: getSongDisplayName(songName),
+            ids: [],
+            names: [],
+            count: 0
+          });
+        }
+
+        const group = songGroups.get(groupKey);
+
+        group.ids.push(request.id);
+        group.names.push(songName);
+        group.count++;
+      });
+
+      const groupedSongs = Array.from(songGroups.values())
+        .sort((a, b) => b.count - a.count);
+
+      box.innerHTML = groupedSongs.map(song => {
+
+        const songForJs = escapeJs(song.name);
+        const idsForJs = escapeJs(JSON.stringify(song.ids));
+
+        return `
+          <div class="completed-song-card">
+
+            <div class="completed-song-header">
+
+              <div class="completed-song-name">
+                🎵 ${escapeHtml(song.name)}
+              </div>
+
+              <div class="completed-song-count">
+                ${song.count} lần
+              </div>
+
+            </div>
+
+            <div class="completed-song-buttons">
+
+              <button
+                class="youtube-btn"
+                onclick="openYoutube('${songForJs}')">
+                🎬 YouTube
+              </button>
+
+              <button
+                class="chord-btn"
+                onclick="openChord('${songForJs}')">
+                🎸 Hợp âm
+              </button>
+
+              <button
+                class="delete-btn"
+                onclick="deleteCompletedSong('${idsForJs}')">
+                🗑 Xóa
+              </button>
+
+            </div>
+
+          </div>
+        `;
+      }).join("");
+
+      return;
+    }
+
+    /* =====================================================
+       MỤC ĐANG CHỜ
+       GIỮ NGUYÊN CÁCH HIỂN THỊ CŨ
+       ===================================================== */
+
     box.innerHTML = data.map(request => {
       const time = formatDate(request.created_at);
+
       /* YOUTUBE: TÌM THEO TÊN BÀI HÁT */
       const youtubeButton = `
         <button
@@ -457,6 +686,7 @@
           🎬 YouTube
         </button>
       `;
+
       /* HỢP ÂM */
       const chordButton = `
         <button
@@ -465,6 +695,7 @@
           🎸 Hợp âm
         </button>
       `;
+
       return `
         <div class="request">
           <div
@@ -472,14 +703,17 @@
             onclick="openLyrics('${escapeJs(request.song_request || "")}')">
             🎵 ${escapeHtml(request.song_request || "")}
           </div>
+
           <div class="info">
             <span class="label">👤 Tên khách:</span>
             ${escapeHtml(request.customer_name || "")}
           </div>
+
           <div class="info">
             <span class="label">🎤 Muốn gửi cho:</span>
             ${escapeHtml(request.send_to || "")}
           </div>
+
           ${
             request.message
               ? `
@@ -491,13 +725,16 @@
               `
               : ""
           }
+
           <div class="time-status">
             <div class="time">🕐 ${time}</div>
+
             ${
               request.priority
                 ? `<div class="priority-icon">🚀</div>`
                 : ""
             }
+
             <div class="status">
               ${
                 request.status === "performing"
@@ -508,6 +745,7 @@
               }
             </div>
           </div>
+
           <div class="buttons">
             ${
               currentTab === "pending"
@@ -528,8 +766,10 @@
                   `
                 : ""
             }
+
             ${youtubeButton}
             ${chordButton}
+
             <button
               class="delete-btn"
               onclick="deleteRequest('${request.id}')">
@@ -540,6 +780,7 @@
       `;
     }).join("");
   }
+
   /* LỜI BÀI HÁT */
   async function openLyrics(songName) {
     if (!songName) return;
@@ -565,6 +806,7 @@
       encodeURIComponent(songName);
     window.location.href = lyricsUrl;
   }
+
   /* YOUTUBE: MỞ TÌM KIẾM THEO TÊN BÀI HÁT */
   function openYoutube(songName) {
     const searchUrl =
@@ -572,6 +814,7 @@
       encodeURIComponent(songName);
     window.location.href = searchUrl;
   }
+
   /* HỢP ÂM CHUẨN */
   function openChord(songName) {
     const searchUrl =
@@ -579,19 +822,23 @@
       encodeURIComponent(songName);
     window.open(searchUrl, "_blank");
   }
+
   /* ĐÁNH DẤU ĐÃ GIAO LƯU */
   async function startPerformance(id) {
     const { error } = await supabaseClient
       .from("requests")
       .update({ status: "performing" })
       .eq("id", id);
+
     if (error) {
       alert("Không thể bắt đầu giao lưu: " + error.message);
       return;
     }
+
     lastDataSignature = "";
     await loadRequests(true);
   }
+
   /* HOÀN THÀNH REQUEST */
   async function completeRequest(id) {
     try {
@@ -602,49 +849,105 @@
           completed_at: new Date().toISOString()
         })
         .eq("id", id);
+
       if (error) throw error;
+
       lastDataSignature = "";
       await loadRequests(true);
+
     } catch (error) {
       alert("Không thể cập nhật: " + error.message);
     }
   }
+
   /* XÓA MỘT BÀI */
   async function deleteRequest(id) {
     const ok = confirm(
       "Anh có chắc muốn xóa bài hát này không?"
     );
     if (!ok) return;
+
     try {
       const { error } = await supabaseClient
         .from("requests")
         .delete()
         .eq("id", id);
+
       if (error) throw error;
+
       lastDataSignature = "";
       await loadRequests(true);
+
     } catch (error) {
       alert("Không thể xóa: " + error.message);
     }
   }
+
+  /* =====================================================
+     XÓA NHÓM BÀI HÁT TRONG MỤC ĐÃ HOÀN THÀNH
+     ===================================================== */
+
+  async function deleteCompletedSong(idsJson) {
+
+    let ids = [];
+
+    try {
+      ids = JSON.parse(idsJson);
+    } catch (error) {
+      alert("Không đọc được danh sách bài hát cần xóa.");
+      return;
+    }
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return;
+    }
+
+    const ok = confirm(
+      "Anh có chắc muốn xóa tất cả yêu cầu đã hoàn thành của bài hát này không?"
+    );
+
+    if (!ok) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from("requests")
+        .delete()
+        .in("id", ids)
+        .eq("status", "completed");
+
+      if (error) throw error;
+
+      lastDataSignature = "";
+      await loadRequests(true);
+
+    } catch (error) {
+      alert("Không thể xóa: " + error.message);
+    }
+  }
+
   /* XÓA TẤT CẢ BÀI ĐÃ HOÀN THÀNH */
   async function deleteAllCompleted() {
     const ok = confirm(
       "⚠️ Anh có chắc muốn xóa TẤT CẢ bài đã hoàn thành không?"
     );
     if (!ok) return;
+
     try {
       const { error } = await supabaseClient
         .from("requests")
         .delete()
         .eq("status", "completed");
+
       if (error) throw error;
+
       lastDataSignature = "";
       await loadRequests(true);
+
     } catch (error) {
       alert("Không thể xóa: " + error.message);
     }
   }
+
   /* ĐỊNH DẠNG THỜI GIAN */
   function formatDate(dateString) {
     if (!dateString) return "";
@@ -657,6 +960,7 @@
       minute: "2-digit"
     });
   }
+
   /* CHỐNG HTML */
   function escapeHtml(value) {
     return String(value)
@@ -666,6 +970,7 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+
   /* CHỐNG LỖI ONCLICK */
   function escapeJs(value) {
     return String(value)
@@ -674,14 +979,17 @@
       .replace(/"/g, '\\"')
       .replace(/\r?\n/g, "\\n");
   }
+
   /* TỰ ĐỘNG KIỂM TRA DỮ LIỆU */
   setInterval(() => {
     loadRequests(false);
   }, 2000);
+
   /* KHỞI ĐỘNG */
   updateClearCompletedButton();
   loadOrderStatus();
   loadRequests(true);
+
 </script>
 </body>
 </html>
