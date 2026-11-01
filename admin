@@ -691,11 +691,14 @@ async function saveSongEdit() {
           .from("lyrics")
           .update(songData)
           .eq("id", existingSong.id);
-      } else {
-        result = await supabaseClient
-          .from("lyrics")
-          .insert(songData);
-      }
+   } else {
+  result = await supabaseClient
+    .from("lyrics")
+    .insert({
+      ...songData,
+      lyrics: ""
+    });
+}
     }
 
     if (result.error) throw result.error;
