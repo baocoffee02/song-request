@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -162,12 +161,6 @@
         🎵 Gửi yêu cầu
       </button>
 
-      <button
-        type="button"
-        onclick="showPriorityConfirm()">
-        🔥 Ưu tiên lên trước
-      </button>
-
       <div id="message"></div>
 
     </div>
@@ -183,68 +176,6 @@
         src="./images/quang-cao/FBB7870D-9EAC-4C86-B79B-A71DD0C2429A.png"
         alt="Quảng cáo Bao Coffee"
       >
-
-    </div>
-
-  </div>
-
-
-  <!-- =====================================================
-       POPUP ƯU TIÊN
-       ===================================================== -->
-
-  <div
-    id="priorityModal"
-    style="
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.6);
-      z-index:9999;
-      align-items:center;
-      justify-content:center;
-    "
-  >
-
-    <div style="
-      background:white;
-      width:90%;
-      max-width:400px;
-      padding:25px;
-      border-radius:15px;
-      text-align:center;
-    ">
-
-      <h3>🔥 Ưu tiên lên trước</h3>
-
-      <p>
-        🌷Bạn cần tặng hoa cho band để được ưu tiên lên trước🌷
-        (mua hoa tại quầy thanh toán)
-      </p>
-
-      <button
-        type="button"
-        onclick="confirmPriority()"
-        style="
-          width:100%;
-          padding:12px;
-          margin-top:10px;
-        "
-      >
-        Đồng ý
-      </button>
-
-      <button
-        type="button"
-        onclick="closePriority()"
-        style="
-          width:100%;
-          padding:12px;
-          margin-top:8px;
-        "
-      >
-        Hủy
-      </button>
 
     </div>
 
@@ -542,47 +473,6 @@
           false;
 
       }
-
-    }
-
-
-    /* =====================================================
-       POPUP ƯU TIÊN
-       ===================================================== */
-
-    function showPriorityConfirm() {
-
-      if (!orderIsOpen) {
-        return;
-      }
-
-      document
-        .getElementById(
-          "priorityModal"
-        )
-        .style.display =
-          "flex";
-
-    }
-
-
-    function closePriority() {
-
-      document
-        .getElementById(
-          "priorityModal"
-        )
-        .style.display =
-          "none";
-
-    }
-
-
-    function confirmPriority() {
-
-      closePriority();
-
-      sendRequest(true);
 
     }
 
